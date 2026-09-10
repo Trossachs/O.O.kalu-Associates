@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FIRM } from "@/lib/firm-data";
+import { ScrollProgress } from "@/components/motion";
 
 const NAV = [
   { to: "/", label: "Home" },
@@ -13,10 +14,27 @@ const NAV = [
 
 export function SiteHeader() {
   const [open, setOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 24);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   return (
-    <header className="sticky top-0 z-50 border-b border-border/70 bg-background/90 backdrop-blur">
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+    <header
+      className={`sticky top-0 z-50 border-b bg-background/90 backdrop-blur transition-all duration-500 ${
+        scrolled ? "border-border shadow-[0_10px_30px_-24px_rgba(0,0,0,0.6)]" : "border-border/50"
+      }`}
+    >
+      <ScrollProgress />
+      <div
+        className={`mx-auto flex max-w-6xl items-center justify-between px-6 transition-all duration-500 ${
+          scrolled ? "py-2.5" : "py-4"
+        }`}
+      >
         <Link to="/" className="flex items-baseline gap-3">
           <span className="font-display text-2xl tracking-tight text-foreground">{FIRM.name}</span>
           <span className="hidden rule-label text-accent sm:inline">Est. {FIRM.founded}</span>
