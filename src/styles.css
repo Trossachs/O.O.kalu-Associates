@@ -126,9 +126,7 @@
 @utility story-link {
   position: relative;
   display: inline-block;
-}
 
-@utility story-link {
   &::after {
     content: "";
     position: absolute;
