@@ -135,10 +135,10 @@ function Index() {
         <div className="mx-auto max-w-6xl px-6 py-24">
           <p className="rule-label text-accent">Client Accounts</p>
           <blockquote className="mt-6 max-w-4xl font-display text-3xl leading-snug md:text-4xl">
-            “{TESTIMONIALS[0].quote}”
+            “{TESTIMONIALS[0]!.quote}”
           </blockquote>
           <p className="mt-6 text-sm text-ink-foreground/70">
-            {TESTIMONIALS[0].author} — {TESTIMONIALS[0].org}
+            {TESTIMONIALS[0]!.author} — {TESTIMONIALS[0]!.org}
           </p>
           <Link
             to="/testimonials"

@@ -23,7 +23,7 @@ const TIMES = ["09:00", "10:30", "13:00", "14:30", "16:00"];
 
 function ConsultationPage() {
   const [submitted, setSubmitted] = useState<null | { name: string; date: string; time: string }>(null);
-  const [time, setTime] = useState(TIMES[1]);
+  const [time, setTime] = useState(TIMES[1]!);
 
   function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -98,7 +98,7 @@ function ConsultationPage() {
                 <label className={label} htmlFor="practice">
                   Practice area
                 </label>
-                <select id="practice" name="practice" className={field} defaultValue={PRACTICE_AREAS[0].title}>
+                <select id="practice" name="practice" className={field} defaultValue={PRACTICE_AREAS[0]!.title}>
                   {PRACTICE_AREAS.map((a) => (
                     <option key={a.slug}>{a.title}</option>
                   ))}
