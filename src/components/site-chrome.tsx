@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FIRM } from "@/lib/firm-data";
+import { Reveal, ScrollProgress } from "@/components/motion";
 
 const NAV = [
   { to: "/", label: "Home" },
