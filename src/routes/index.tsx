@@ -77,7 +77,7 @@ function Index() {
         <Parallax speed={0.18} className="absolute inset-0 scale-125">
           <img
             src={facade}
-            alt="Stone columns of the firm's Wall Street building at dusk"
+            alt="Stone colonnade of the chambers building in Abuja at dusk"
             width={1400}
             height={900}
             loading="lazy"
@@ -86,9 +86,9 @@ function Index() {
         </Parallax>
         <div className="relative mx-auto max-w-6xl px-6 py-32">
           <Reveal>
-            <p className="rule-label text-accent">48 Wall Street</p>
+            <p className="rule-label text-accent">Abuja · Lagos · Port Harcourt</p>
             <p className="mt-5 max-w-2xl font-display text-3xl leading-snug md:text-4xl">
-              Thirty-two years in the same building, three floors above the street that keeps us busy.
+              Three offices, one bench: the Federal Capital Territory, the commercial capital, and the oil rivers.
             </p>
           </Reveal>
         </div>
