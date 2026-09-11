@@ -7,9 +7,9 @@ import tobias from "@/assets/attorney-tobias.jpg";
 
 export const ATTORNEY_PHOTOS: Record<string, string> = {
   "adaeze-okonjo": adaeze,
-  "marcus-hale": marcus,
-  "liv-sorensen": liv,
-  "rafael-mendes": rafael,
-  "eleanor-whitfield": eleanor,
-  "tobias-lin": tobias,
+  "chukwuemeka-bassey": marcus,
+  "halima-yakubu": liv,
+  "tunde-alabi": rafael,
+  "ngozi-eze-whyte": eleanor,
+  "ibrahim-suleiman": tobias,
 };
