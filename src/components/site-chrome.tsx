@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { FIRM } from "@/lib/firm-data";
-import { ScrollProgress } from "@/components/motion";
+import { Reveal, ScrollProgress, ZoomImage } from "@/components/motion";
 
 const NAV = [
   { to: "/", label: "Home" },
@@ -101,11 +101,18 @@ export function SiteFooter() {
           <p className="mt-3 max-w-xs text-sm text-ink-foreground/70">{FIRM.tagline}</p>
         </div>
         <div>
-          <p className="rule-label text-accent">Chambers</p>
-          <address className="mt-3 space-y-1 text-sm not-italic text-ink-foreground/80">
-            <p>{FIRM.address}</p>
-            <p>{FIRM.phone}</p>
-            <p>{FIRM.email}</p>
+          <p className="rule-label text-accent">Offices</p>
+          <address className="mt-3 space-y-3 text-sm not-italic text-ink-foreground/80">
+            {FIRM.offices.map((o) => (
+              <div key={o.city}>
+                <p className="text-xs uppercase tracking-widest text-ink-foreground/60">{o.city}</p>
+                <p>{o.detail}</p>
+              </div>
+            ))}
+            <div>
+              <p>{FIRM.phone}</p>
+              <p>{FIRM.email}</p>
+            </div>
           </address>
         </div>
         <div>
@@ -122,7 +129,8 @@ export function SiteFooter() {
         </div>
       </div>
       <div className="border-t border-white/10 py-5 text-center text-xs text-ink-foreground/50">
-        © {new Date().getFullYear()} {FIRM.name}. Attorney advertising. Prior results do not guarantee a similar outcome.
+        © {new Date().getFullYear()} {FIRM.name}. Regulated by the Nigerian Bar Association and the Rules of Professional
+        Conduct. Prior results do not guarantee a similar outcome.
       </div>
     </footer>
   );
@@ -132,17 +140,50 @@ export function PageHeader({
   eyebrow,
   title,
   intro,
+  image,
+  imageAlt,
 }: {
   eyebrow: string;
   title: string;
   intro: string;
+  image?: string;
+  imageAlt?: string;
 }) {
+  if (!image) {
+    return (
+      <section className="border-b border-border bg-parchment">
+        <div className="mx-auto max-w-6xl px-6 py-20">
+          <p className="rule-label text-accent">{eyebrow}</p>
+          <h1 className="mt-4 max-w-3xl text-5xl leading-[1.05] text-foreground md:text-6xl">{title}</h1>
+          <p className="mt-6 max-w-2xl text-base leading-relaxed text-muted-foreground">{intro}</p>
+        </div>
+      </section>
+    );
+  }
+
   return (
-    <section className="border-b border-border bg-parchment">
-      <div className="mx-auto max-w-6xl px-6 py-20">
-        <p className="rule-label text-accent">{eyebrow}</p>
-        <h1 className="mt-4 max-w-3xl text-5xl leading-[1.05] text-foreground md:text-6xl">{title}</h1>
-        <p className="mt-6 max-w-2xl text-base leading-relaxed text-muted-foreground">{intro}</p>
+    <section className="relative isolate overflow-hidden border-b border-border bg-ink text-ink-foreground">
+      <ZoomImage
+        src={image}
+        alt={imageAlt ?? ""}
+        priority
+        className="absolute inset-0 -z-10"
+        imgClassName="opacity-40"
+      />
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 -z-10 bg-[linear-gradient(100deg,var(--ink)_15%,color-mix(in_oklab,var(--ink)_72%,transparent)_65%,transparent)]"
+      />
+      <div className="mx-auto max-w-6xl px-6 py-28 md:py-36">
+        <Reveal>
+          <p className="rule-label text-accent">{eyebrow}</p>
+        </Reveal>
+        <Reveal delay={140}>
+          <h1 className="mt-4 max-w-3xl text-5xl leading-[1.05] md:text-6xl">{title}</h1>
+        </Reveal>
+        <Reveal delay={280}>
+          <p className="mt-6 max-w-2xl text-base leading-relaxed text-ink-foreground/80">{intro}</p>
+        </Reveal>
       </div>
     </section>
   );

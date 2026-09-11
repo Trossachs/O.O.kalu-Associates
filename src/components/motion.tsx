@@ -19,26 +19,16 @@ function usePrefersReducedMotion() {
   return reduced;
 }
 
-/** Fades and lifts content into place the first time it scrolls into view. */
-export function Reveal({
-  children,
-  delay = 0,
-  y = 24,
-  className,
-  as: Tag = "div",
-}: {
-  children: ReactNode;
-  delay?: number;
-  y?: number;
-  className?: string;
-  as?: "div" | "section" | "article" | "li" | "span";
-}) {
-  const ref = useRef<HTMLElement | null>(null);
+/** Cinematic easing shared by every scroll-driven effect. */
+const CINEMATIC = "cubic-bezier(0.19, 1, 0.22, 1)";
+
+/** Observes an element and reports the first time it enters the viewport. */
+function useInView<T extends HTMLElement>(enabled = true, threshold = 0.18) {
+  const ref = useRef<T | null>(null);
   const [shown, setShown] = useState(false);
-  const reduced = usePrefersReducedMotion();
 
   useEffect(() => {
-    if (reduced) {
+    if (!enabled) {
       setShown(true);
       return;
     }
@@ -53,29 +43,88 @@ export function Reveal({
           }
         }
       },
-      { threshold: 0.15, rootMargin: "0px 0px -8% 0px" },
+      { threshold, rootMargin: "0px 0px -10% 0px" },
     );
     io.observe(el);
     return () => io.disconnect();
-  }, [reduced]);
+  }, [enabled, threshold]);
+
+  return { ref, shown };
+}
+
+/** Fades, lifts and settles content into place the first time it scrolls into view. */
+export function Reveal({
+  children,
+  delay = 0,
+  y = 34,
+  blur = 8,
+  className,
+  as: Tag = "div",
+}: {
+  children: ReactNode;
+  delay?: number;
+  y?: number;
+  blur?: number;
+  className?: string;
+  as?: "div" | "section" | "article" | "li" | "span";
+}) {
+  const reduced = usePrefersReducedMotion();
+  const { ref, shown } = useInView<HTMLElement>(!reduced);
 
   const style: CSSProperties = {
     transitionDelay: `${delay}ms`,
-    transform: shown ? "none" : `translate3d(0, ${y}px, 0)`,
+    transitionDuration: "1250ms",
+    transitionTimingFunction: CINEMATIC,
+    transitionProperty: "opacity, transform, filter",
+    transform: shown ? "none" : `translate3d(0, ${y}px, 0) scale(0.985)`,
+    filter: shown ? "blur(0px)" : `blur(${blur}px)`,
     opacity: shown ? 1 : 0,
   };
 
   return (
-    <Tag
-      ref={ref as never}
-      style={style}
-      className={cn(
-        "transition-[opacity,transform] duration-[900ms] ease-[cubic-bezier(0.16,1,0.3,1)] will-change-transform",
-        className,
-      )}
-    >
+    <Tag ref={ref as never} style={style} className={cn("will-change-transform", className)}>
       {children}
     </Tag>
+  );
+}
+
+/** Full-bleed image that slowly zooms out of an over-scaled crop as it appears. */
+export function ZoomImage({
+  src,
+  alt,
+  className,
+  imgClassName,
+  priority = false,
+  width = 1600,
+  height = 800,
+}: {
+  src: string;
+  alt: string;
+  className?: string;
+  imgClassName?: string;
+  priority?: boolean;
+  width?: number;
+  height?: number;
+}) {
+  const reduced = usePrefersReducedMotion();
+  const { ref, shown } = useInView<HTMLDivElement>(!reduced, 0.05);
+
+  return (
+    <div ref={ref} className={cn("overflow-hidden", className)}>
+      <img
+        src={src}
+        alt={alt}
+        width={width}
+        height={height}
+        loading={priority ? "eager" : "lazy"}
+        style={{
+          transform: shown ? "scale(1)" : "scale(1.22)",
+          opacity: shown ? 1 : 0,
+          transition: `transform 2200ms ${CINEMATIC}, opacity 1400ms ${CINEMATIC}`,
+        }}
+        className={cn("h-full w-full object-cover will-change-transform", imgClassName)}
+      />
+    </div>
   );
 }
 

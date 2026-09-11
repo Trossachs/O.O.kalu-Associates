@@ -81,7 +81,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { title: "Equity Chambers — Counsel for Consequential Matters" },
       {
         name: "description",
-        content: "A New York law firm advising boards, institutions, and families in consequential matters.",
+        content:
+          "A Nigerian law firm in Abuja, Lagos, and Port Harcourt advising boards, institutions, and families in consequential matters.",
       },
       { name: "author", content: "Equity Chambers" },
       { property: "og:type", content: "website" },

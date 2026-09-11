@@ -2,18 +2,21 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { PageHeader } from "@/components/site-chrome";
 import { FIRM, PRACTICE_AREAS } from "@/lib/firm-data";
+import heroConsultation from "@/assets/hero-consultation.jpg";
 
 export const Route = createFileRoute("/consultation")({
   head: () => ({
     meta: [
-      { title: "Book a Consultation — Equity Chambers" },
+      { title: "Book a Consultation — Equity Chambers Nigeria" },
       {
         name: "description",
         content:
-          "Request a confidential consultation with an Equity Chambers partner. Describe your matter and we will respond within one business day.",
+          "Request a confidential consultation with an Equity Chambers partner in Abuja, Lagos, or Port Harcourt. Describe your matter and we respond within one business day.",
       },
-      { property: "og:title", content: "Book a Consultation — Equity Chambers" },
+      { property: "og:title", content: "Book a Consultation — Equity Chambers Nigeria" },
       { property: "og:description", content: "Confidential consultations with the partners of Equity Chambers." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: ConsultationPage,
@@ -44,8 +47,11 @@ function ConsultationPage() {
       <PageHeader
         eyebrow="Consultation"
         title="Tell us what happened"
-        intro="Initial consultations are confidential and carry no obligation. A partner reviews every request personally."
+        intro="Initial consultations are confidential and carry no obligation. A partner reviews every request personally. All times are West Africa Time (WAT)."
+        image={heroConsultation}
+        imageAlt="Chambers meeting room in Abuja with brass detailing and evening light"
       />
+
 
       <div className="mx-auto grid max-w-6xl gap-16 px-6 py-20 lg:grid-cols-[1.4fr_1fr]">
         <div>
@@ -157,13 +163,20 @@ function ConsultationPage() {
         </div>
 
         <aside className="hairline-top pt-8 lg:border-0 lg:pt-0">
-          <p className="rule-label text-accent">Chambers</p>
-          <address className="mt-4 space-y-2 text-sm not-italic leading-relaxed text-foreground">
-            <p>{FIRM.address}</p>
-            <p>{FIRM.phone}</p>
-            <p>{FIRM.email}</p>
+          <p className="rule-label text-accent">Offices</p>
+          <address className="mt-4 space-y-4 text-sm not-italic leading-relaxed text-foreground">
+            {FIRM.offices.map((o) => (
+              <div key={o.city}>
+                <p className="text-xs uppercase tracking-widest text-muted-foreground">{o.city}</p>
+                <p>{o.detail}</p>
+              </div>
+            ))}
+            <div>
+              <p>{FIRM.phone}</p>
+              <p>{FIRM.email}</p>
+            </div>
           </address>
-          <p className="mt-8 rule-label text-accent">Hours</p>
+          <p className="mt-8 rule-label text-accent">Hours (WAT)</p>
           <ul className="mt-4 space-y-1 text-sm text-muted-foreground">
             <li>Monday – Friday, 8:30 – 18:30</li>
             <li>Saturday, by appointment</li>

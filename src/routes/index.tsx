@@ -2,23 +2,25 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { ATTORNEYS, CASES, FIRM, PRACTICE_AREAS, PUBLICATIONS, TESTIMONIALS } from "@/lib/firm-data";
 import { ATTORNEY_PHOTOS } from "@/lib/attorney-photos";
 import { Parallax, Reveal, TiltCard } from "@/components/motion";
-import heroChambers from "@/assets/hero-chambers.jpg";
+import { HeroSlider } from "@/components/hero-slider";
 import facade from "@/assets/facade.jpg";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Equity Chambers — Counsel for Consequential Matters" },
+      { title: "Equity Chambers — Nigerian Commercial & Dispute Resolution Law Firm" },
       {
         name: "description",
         content:
-          "Equity Chambers is a New York law firm advising boards, institutions, and families on transactions, trials, regulatory defense, intellectual property, and succession.",
+          "Equity Chambers is a Nigerian law firm in Abuja, Lagos, and Port Harcourt advising boards, institutions, and families on transactions, litigation, arbitration, energy, and regulatory matters.",
       },
-      { property: "og:title", content: "Equity Chambers — Counsel for Consequential Matters" },
+      { property: "og:title", content: "Equity Chambers — Nigerian Commercial & Dispute Resolution Law Firm" },
       {
         property: "og:description",
-        content: "A New York firm of trial lawyers and transactional counsel, practising since 1994.",
+        content: "A Nigerian firm of advocates and transactional counsel, practising since 1994.",
       },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: Index,
@@ -27,70 +29,25 @@ export const Route = createFileRoute("/")({
 function Index() {
   return (
     <div>
-      <section className="relative isolate overflow-hidden bg-ink text-ink-foreground">
-        <Parallax speed={0.12} className="absolute inset-0 -z-10 scale-110">
-          <img
-            src={heroChambers}
-            alt="The reading room at Equity Chambers, lined with law reports and lit by brass lamps"
-            width={1600}
-            height={1000}
-            className="h-full w-full object-cover opacity-40"
-          />
-        </Parallax>
-        <div
-          aria-hidden="true"
-          className="absolute inset-0 -z-10 bg-[linear-gradient(100deg,var(--ink)_20%,color-mix(in_oklab,var(--ink)_70%,transparent)_60%,transparent)]"
-        />
+      <HeroSlider />
 
-        <div className="mx-auto grid max-w-6xl gap-12 px-6 py-28 lg:grid-cols-[1.3fr_1fr] lg:py-40">
-          <div>
-            <Reveal delay={0}>
-              <p className="rule-label text-accent">New York · Since {FIRM.founded}</p>
-            </Reveal>
-            <Reveal delay={120}>
-              <h1 className="mt-6 text-5xl leading-[1.02] md:text-7xl">
-                Counsel for the matters that decide the decade.
-              </h1>
-            </Reveal>
-            <Reveal delay={240}>
-              <p className="mt-8 max-w-xl text-base leading-relaxed text-ink-foreground/80">
-                Equity Chambers represents boards, institutions, and families when the transaction is complicated, the
-                exposure is real, and the outcome cannot be delegated.
-              </p>
-            </Reveal>
-            <Reveal delay={360}>
-              <div className="mt-10 flex flex-wrap gap-4">
-                <Link
-                  to="/consultation"
-                  className="rounded-sm bg-accent px-7 py-3 text-sm text-accent-foreground transition-transform duration-300 hover:-translate-y-0.5 hover:opacity-90"
-                >
-                  Book a consultation
-                </Link>
-                <Link
-                  to="/practice-areas"
-                  className="rounded-sm border border-white/25 px-7 py-3 text-sm text-ink-foreground transition-all duration-300 hover:-translate-y-0.5 hover:border-accent"
-                >
-                  Explore practice areas
-                </Link>
+      <section className="border-b border-border bg-parchment">
+        <dl className="mx-auto grid max-w-6xl gap-8 px-6 py-14 sm:grid-cols-3">
+          {[
+            { k: "Years in practice", v: `${new Date().getFullYear() - FIRM.founded}` },
+            { k: "Matters led to judgment or award", v: "180+" },
+            { k: "Transaction value advised", v: "$4.1B" },
+          ].map((s, i) => (
+            <Reveal key={s.k} delay={i * 140}>
+              <div className="border-t border-border pt-4">
+                <dd className="font-display text-4xl text-accent">{s.v}</dd>
+                <dt className="mt-1 text-xs uppercase tracking-widest text-muted-foreground">{s.k}</dt>
               </div>
             </Reveal>
-          </div>
-          <dl className="grid grid-cols-2 gap-8 self-end lg:grid-cols-1">
-            {[
-              { k: "Years in practice", v: `${new Date().getFullYear() - FIRM.founded}` },
-              { k: "First-chair verdicts", v: "180+" },
-              { k: "Transaction value advised", v: "$41B" },
-            ].map((s, i) => (
-              <Reveal key={s.k} delay={400 + i * 120}>
-                <div className="border-t border-white/15 pt-4">
-                  <dd className="font-display text-4xl text-accent">{s.v}</dd>
-                  <dt className="mt-1 text-xs uppercase tracking-widest text-ink-foreground/70">{s.k}</dt>
-                </div>
-              </Reveal>
-            ))}
-          </dl>
-        </div>
+          ))}
+        </dl>
       </section>
+
 
       <section className="mx-auto max-w-6xl px-6 py-24">
         <Reveal>
@@ -120,7 +77,7 @@ function Index() {
         <Parallax speed={0.18} className="absolute inset-0 scale-125">
           <img
             src={facade}
-            alt="Stone columns of the firm's Wall Street building at dusk"
+            alt="Stone colonnade of the chambers building in Abuja at dusk"
             width={1400}
             height={900}
             loading="lazy"
@@ -129,9 +86,9 @@ function Index() {
         </Parallax>
         <div className="relative mx-auto max-w-6xl px-6 py-32">
           <Reveal>
-            <p className="rule-label text-accent">48 Wall Street</p>
+            <p className="rule-label text-accent">Abuja · Lagos · Port Harcourt</p>
             <p className="mt-5 max-w-2xl font-display text-3xl leading-snug md:text-4xl">
-              Thirty-two years in the same building, three floors above the street that keeps us busy.
+              Three offices, one bench: the Federal Capital Territory, the commercial capital, and the oil rivers.
             </p>
           </Reveal>
         </div>
