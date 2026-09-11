@@ -3,18 +3,21 @@ import { PageHeader } from "@/components/site-chrome";
 import { ATTORNEYS } from "@/lib/firm-data";
 import { ATTORNEY_PHOTOS } from "@/lib/attorney-photos";
 import { Reveal, TiltCard } from "@/components/motion";
+import heroAttorneys from "@/assets/hero-attorneys.jpg";
 
 export const Route = createFileRoute("/attorneys")({
   head: () => ({
     meta: [
-      { title: "Attorneys — Equity Chambers" },
+      { title: "Attorneys — Equity Chambers Nigeria" },
       {
         name: "description",
         content:
-          "Meet the partners of Equity Chambers: transactional, trial, regulatory, intellectual property, private client, and real estate counsel.",
+          "Meet the partners of Equity Chambers: transactional, disputes, energy, regulatory, private client, and real estate counsel called to the Nigerian Bar.",
       },
-      { property: "og:title", content: "Attorneys — Equity Chambers" },
+      { property: "og:title", content: "Attorneys — Equity Chambers Nigeria" },
       { property: "og:description", content: "Partner profiles, credentials, and admissions at Equity Chambers." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: AttorneysPage,
@@ -25,9 +28,12 @@ function AttorneysPage() {
     <div>
       <PageHeader
         eyebrow="The Bench"
-        title="Partners who try the cases they take"
-        intro="Every matter is led by a partner. The person who pitches the work is the person who argues it."
+        title="Partners who argue the matters they take"
+        intro="Every matter is led by a partner called to the Nigerian Bar. The person who pitches the work is the person who argues it."
+        image={heroAttorneys}
+        imageAlt="Barristers' black robes hanging on brass hooks in a chambers robing room"
       />
+
 
       <div className="mx-auto max-w-6xl px-6 py-20">
         <div className="space-y-px bg-border">
