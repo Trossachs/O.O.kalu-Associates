@@ -101,11 +101,18 @@ export function SiteFooter() {
           <p className="mt-3 max-w-xs text-sm text-ink-foreground/70">{FIRM.tagline}</p>
         </div>
         <div>
-          <p className="rule-label text-accent">Chambers</p>
-          <address className="mt-3 space-y-1 text-sm not-italic text-ink-foreground/80">
-            <p>{FIRM.address}</p>
-            <p>{FIRM.phone}</p>
-            <p>{FIRM.email}</p>
+          <p className="rule-label text-accent">Offices</p>
+          <address className="mt-3 space-y-3 text-sm not-italic text-ink-foreground/80">
+            {FIRM.offices.map((o) => (
+              <div key={o.city}>
+                <p className="text-xs uppercase tracking-widest text-ink-foreground/60">{o.city}</p>
+                <p>{o.detail}</p>
+              </div>
+            ))}
+            <div>
+              <p>{FIRM.phone}</p>
+              <p>{FIRM.email}</p>
+            </div>
           </address>
         </div>
         <div>
@@ -122,7 +129,8 @@ export function SiteFooter() {
         </div>
       </div>
       <div className="border-t border-white/10 py-5 text-center text-xs text-ink-foreground/50">
-        © {new Date().getFullYear()} {FIRM.name}. Attorney advertising. Prior results do not guarantee a similar outcome.
+        © {new Date().getFullYear()} {FIRM.name}. Regulated by the Nigerian Bar Association and the Rules of Professional
+        Conduct. Prior results do not guarantee a similar outcome.
       </div>
     </footer>
   );
