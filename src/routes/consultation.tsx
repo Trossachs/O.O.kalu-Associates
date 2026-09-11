@@ -163,13 +163,20 @@ function ConsultationPage() {
         </div>
 
         <aside className="hairline-top pt-8 lg:border-0 lg:pt-0">
-          <p className="rule-label text-accent">Chambers</p>
-          <address className="mt-4 space-y-2 text-sm not-italic leading-relaxed text-foreground">
-            <p>{FIRM.address}</p>
-            <p>{FIRM.phone}</p>
-            <p>{FIRM.email}</p>
+          <p className="rule-label text-accent">Offices</p>
+          <address className="mt-4 space-y-4 text-sm not-italic leading-relaxed text-foreground">
+            {FIRM.offices.map((o) => (
+              <div key={o.city}>
+                <p className="text-xs uppercase tracking-widest text-muted-foreground">{o.city}</p>
+                <p>{o.detail}</p>
+              </div>
+            ))}
+            <div>
+              <p>{FIRM.phone}</p>
+              <p>{FIRM.email}</p>
+            </div>
           </address>
-          <p className="mt-8 rule-label text-accent">Hours</p>
+          <p className="mt-8 rule-label text-accent">Hours (WAT)</p>
           <ul className="mt-4 space-y-1 text-sm text-muted-foreground">
             <li>Monday – Friday, 8:30 – 18:30</li>
             <li>Saturday, by appointment</li>
