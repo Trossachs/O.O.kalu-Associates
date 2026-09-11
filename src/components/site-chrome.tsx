@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { FIRM } from "@/lib/firm-data";
-import { ScrollProgress } from "@/components/motion";
+import { Reveal, ScrollProgress, ZoomImage } from "@/components/motion";
 
 const NAV = [
   { to: "/", label: "Home" },
@@ -132,17 +132,50 @@ export function PageHeader({
   eyebrow,
   title,
   intro,
+  image,
+  imageAlt,
 }: {
   eyebrow: string;
   title: string;
   intro: string;
+  image?: string;
+  imageAlt?: string;
 }) {
+  if (!image) {
+    return (
+      <section className="border-b border-border bg-parchment">
+        <div className="mx-auto max-w-6xl px-6 py-20">
+          <p className="rule-label text-accent">{eyebrow}</p>
+          <h1 className="mt-4 max-w-3xl text-5xl leading-[1.05] text-foreground md:text-6xl">{title}</h1>
+          <p className="mt-6 max-w-2xl text-base leading-relaxed text-muted-foreground">{intro}</p>
+        </div>
+      </section>
+    );
+  }
+
   return (
-    <section className="border-b border-border bg-parchment">
-      <div className="mx-auto max-w-6xl px-6 py-20">
-        <p className="rule-label text-accent">{eyebrow}</p>
-        <h1 className="mt-4 max-w-3xl text-5xl leading-[1.05] text-foreground md:text-6xl">{title}</h1>
-        <p className="mt-6 max-w-2xl text-base leading-relaxed text-muted-foreground">{intro}</p>
+    <section className="relative isolate overflow-hidden border-b border-border bg-ink text-ink-foreground">
+      <ZoomImage
+        src={image}
+        alt={imageAlt ?? ""}
+        priority
+        className="absolute inset-0 -z-10"
+        imgClassName="opacity-40"
+      />
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 -z-10 bg-[linear-gradient(100deg,var(--ink)_15%,color-mix(in_oklab,var(--ink)_72%,transparent)_65%,transparent)]"
+      />
+      <div className="mx-auto max-w-6xl px-6 py-28 md:py-36">
+        <Reveal>
+          <p className="rule-label text-accent">{eyebrow}</p>
+        </Reveal>
+        <Reveal delay={140}>
+          <h1 className="mt-4 max-w-3xl text-5xl leading-[1.05] md:text-6xl">{title}</h1>
+        </Reveal>
+        <Reveal delay={280}>
+          <p className="mt-6 max-w-2xl text-base leading-relaxed text-ink-foreground/80">{intro}</p>
+        </Reveal>
       </div>
     </section>
   );
