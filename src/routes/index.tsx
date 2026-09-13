@@ -3,6 +3,8 @@ import { ATTORNEYS, CASES, FIRM, PRACTICE_AREAS, PUBLICATIONS, TESTIMONIALS } fr
 import { ATTORNEY_PHOTOS } from "@/lib/attorney-photos";
 import { Parallax, Reveal, TiltCard } from "@/components/motion";
 import { HeroSlider } from "@/components/hero-slider";
+import { FounderBook } from "@/components/founder-book";
+import { CasesCarousel } from "@/components/cases-carousel";
 import facade from "@/assets/facade.jpg";
 
 export const Route = createFileRoute("/")({
@@ -133,6 +135,8 @@ function Index() {
         </div>
       </section>
 
+      <FounderBook />
+
       <section className="mx-auto max-w-6xl px-6 py-24">
         <Reveal>
           <div className="flex flex-wrap items-end justify-between gap-6">
@@ -145,17 +149,9 @@ function Index() {
             </Link>
           </div>
         </Reveal>
-        <ul className="mt-10 divide-y divide-border border-y border-border">
-          {CASES.slice(0, 4).map((c, i) => (
-            <Reveal as="li" key={c.title} delay={i * 80}>
-              <div className="grid gap-3 py-6 transition-all duration-500 hover:translate-x-1 md:grid-cols-[5rem_1fr_12rem] md:items-baseline">
-                <span className="rule-label text-accent">{c.year}</span>
-                <span className="text-lg text-foreground">{c.title}</span>
-                <span className="text-sm text-muted-foreground md:text-right">{c.outcome}</span>
-              </div>
-            </Reveal>
-          ))}
-        </ul>
+        <Reveal delay={120} className="mt-10">
+          <CasesCarousel cases={CASES} />
+        </Reveal>
       </section>
 
       <section className="bg-ink text-ink-foreground">
