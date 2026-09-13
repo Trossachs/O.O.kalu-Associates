@@ -64,10 +64,10 @@ export function CasesCarousel({ cases }: { cases: NotableCase[] }) {
       </CarouselContent>
 
       <div className="mt-8 flex items-center justify-between gap-6">
-        <p className="rule-label text-muted-foreground" aria-live="polite">
+        <p className="rule-label shrink-0 whitespace-nowrap text-muted-foreground" aria-live="polite">
           {String(selected + 1).padStart(2, "0")} / {String(cases.length).padStart(2, "0")}
         </p>
-        <div className="flex items-center gap-2">
+        <div className="hidden items-center gap-2 sm:flex">
           {cases.map((item, index) => (
             <Button
               key={item.title}
