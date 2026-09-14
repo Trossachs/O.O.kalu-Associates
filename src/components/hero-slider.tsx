@@ -117,7 +117,7 @@ export function HeroSlider() {
               }}
             >
               <p className="rule-label text-accent">{s.eyebrow}</p>
-              <h1 className="mt-6 text-5xl leading-[1.02] md:text-7xl">{s.title}</h1>
+              <h2 className="mt-6 text-5xl leading-[1.02] md:text-7xl">{s.title}</h2>
               <p className="mt-8 max-w-xl text-base leading-relaxed text-ink-foreground/80">{s.body}</p>
               <div className="mt-10 flex flex-wrap gap-4">
                 <Link

@@ -2,13 +2,12 @@ import { Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { FIRM } from "@/lib/firm-data";
 import { Reveal, ScrollProgress, ZoomImage } from "@/components/motion";
+import { Button } from "@/components/ui/button";
 
 const NAV = [
   { to: "/", label: "Home" },
   { to: "/practice-areas", label: "Practice Areas" },
   { to: "/attorneys", label: "Attorneys" },
-  { to: "/notable-cases", label: "Notable Cases" },
-  { to: "/testimonials", label: "Testimonials" },
   { to: "/publications", label: "Publications" },
 ] as const;
 
@@ -59,15 +58,16 @@ export function SiteHeader() {
           </Link>
         </nav>
 
-        <button
+        <Button
           type="button"
+          variant="ghost"
           onClick={() => setOpen((v) => !v)}
           aria-expanded={open}
           aria-label="Toggle navigation"
           className="rule-label text-muted-foreground lg:hidden"
         >
           {open ? "Close" : "Menu"}
-        </button>
+        </Button>
       </div>
 
       {open && (

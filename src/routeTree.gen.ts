@@ -12,10 +12,8 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AttorneysRouteImport } from './routes/attorneys'
 import { Route as ConsultationRouteImport } from './routes/consultation'
-import { Route as NotableCasesRouteImport } from './routes/notable-cases'
 import { Route as PracticeAreasRouteImport } from './routes/practice-areas'
 import { Route as PublicationsRouteImport } from './routes/publications'
-import { Route as TestimonialsRouteImport } from './routes/testimonials'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -32,11 +30,6 @@ const ConsultationRoute = ConsultationRouteImport.update({
   path: '/consultation',
   getParentRoute: () => rootRouteImport,
 } as any)
-const NotableCasesRoute = NotableCasesRouteImport.update({
-  id: '/notable-cases',
-  path: '/notable-cases',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const PracticeAreasRoute = PracticeAreasRouteImport.update({
   id: '/practice-areas',
   path: '/practice-areas',
@@ -47,78 +40,50 @@ const PublicationsRoute = PublicationsRouteImport.update({
   path: '/publications',
   getParentRoute: () => rootRouteImport,
 } as any)
-const TestimonialsRoute = TestimonialsRouteImport.update({
-  id: '/testimonials',
-  path: '/testimonials',
-  getParentRoute: () => rootRouteImport,
-} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/attorneys': typeof AttorneysRoute
   '/consultation': typeof ConsultationRoute
-  '/notable-cases': typeof NotableCasesRoute
   '/practice-areas': typeof PracticeAreasRoute
   '/publications': typeof PublicationsRoute
-  '/testimonials': typeof TestimonialsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/attorneys': typeof AttorneysRoute
   '/consultation': typeof ConsultationRoute
-  '/notable-cases': typeof NotableCasesRoute
   '/practice-areas': typeof PracticeAreasRoute
   '/publications': typeof PublicationsRoute
-  '/testimonials': typeof TestimonialsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/attorneys': typeof AttorneysRoute
   '/consultation': typeof ConsultationRoute
-  '/notable-cases': typeof NotableCasesRoute
   '/practice-areas': typeof PracticeAreasRoute
   '/publications': typeof PublicationsRoute
-  '/testimonials': typeof TestimonialsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    | '/'
-    | '/attorneys'
-    | '/consultation'
-    | '/notable-cases'
-    | '/practice-areas'
-    | '/publications'
-    | '/testimonials'
+    '/' | '/attorneys' | '/consultation' | '/practice-areas' | '/publications'
   fileRoutesByTo: FileRoutesByTo
-  to:
-    | '/'
-    | '/attorneys'
-    | '/consultation'
-    | '/notable-cases'
-    | '/practice-areas'
-    | '/publications'
-    | '/testimonials'
+  to: '/' | '/attorneys' | '/consultation' | '/practice-areas' | '/publications'
   id:
     | '__root__'
     | '/'
     | '/attorneys'
     | '/consultation'
-    | '/notable-cases'
     | '/practice-areas'
     | '/publications'
-    | '/testimonials'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AttorneysRoute: typeof AttorneysRoute
   ConsultationRoute: typeof ConsultationRoute
-  NotableCasesRoute: typeof NotableCasesRoute
   PracticeAreasRoute: typeof PracticeAreasRoute
   PublicationsRoute: typeof PublicationsRoute
-  TestimonialsRoute: typeof TestimonialsRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -144,13 +109,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ConsultationRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/notable-cases': {
-      id: '/notable-cases'
-      path: '/notable-cases'
-      fullPath: '/notable-cases'
-      preLoaderRoute: typeof NotableCasesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/practice-areas': {
       id: '/practice-areas'
       path: '/practice-areas'
@@ -165,13 +123,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PublicationsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/testimonials': {
-      id: '/testimonials'
-      path: '/testimonials'
-      fullPath: '/testimonials'
-      preLoaderRoute: typeof TestimonialsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
   }
 }
 
@@ -179,10 +130,8 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AttorneysRoute: AttorneysRoute,
   ConsultationRoute: ConsultationRoute,
-  NotableCasesRoute: NotableCasesRoute,
   PracticeAreasRoute: PracticeAreasRoute,
   PublicationsRoute: PublicationsRoute,
-  TestimonialsRoute: TestimonialsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

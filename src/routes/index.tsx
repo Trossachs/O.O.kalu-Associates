@@ -1,10 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ATTORNEYS, CASES, FIRM, PRACTICE_AREAS, PUBLICATIONS, TESTIMONIALS } from "@/lib/firm-data";
-import { ATTORNEY_PHOTOS } from "@/lib/attorney-photos";
 import { Parallax, Reveal, TiltCard } from "@/components/motion";
 import { HeroSlider } from "@/components/hero-slider";
 import { FounderBook } from "@/components/founder-book";
 import { CasesCarousel } from "@/components/cases-carousel";
+import { Button } from "@/components/ui/button";
+import { BriefcaseBusiness, Building2, Landmark, Scale } from "lucide-react";
 import facade from "@/assets/facade.jpg";
 
 export const Route = createFileRoute("/")({
@@ -29,9 +30,30 @@ export const Route = createFileRoute("/")({
 });
 
 function Index() {
+  const benchIcons = [Scale, BriefcaseBusiness, Landmark, Building2];
+
   return (
     <div>
-      <HeroSlider />
+      <section className="relative isolate flex min-h-[70vh] items-center justify-center overflow-hidden bg-ink text-center text-ink-foreground lg:h-screen">
+        <img
+          src={facade}
+          alt="Equity Chambers building in Abuja"
+          width={1400}
+          height={900}
+          loading="eager"
+          className="absolute inset-0 -z-20 h-full w-full object-cover"
+        />
+        <div className="absolute inset-0 -z-10 bg-ink/50" aria-hidden="true" />
+        <Reveal className="mx-auto max-w-5xl px-6">
+          <p className="rule-label text-accent">Equity Chambers · Nigeria</p>
+          <h1 className="mt-6 text-5xl font-semibold leading-[1.02] text-ink-foreground md:text-7xl lg:text-8xl">
+            Bring us the matter you cannot afford to lose.
+          </h1>
+          <Button asChild size="lg" className="mt-10 bg-accent text-accent-foreground hover:bg-accent/90">
+            <Link to="/consultation">Book a Consultation</Link>
+          </Button>
+        </Reveal>
+      </section>
 
       <section className="border-b border-border bg-parchment">
         <dl className="mx-auto grid max-w-6xl gap-8 px-6 py-14 sm:grid-cols-3">
@@ -109,33 +131,32 @@ function Index() {
               </Link>
             </div>
           </Reveal>
-          <div className="mt-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-            {ATTORNEYS.slice(0, 3).map((a, i) => (
+          <div className="mt-10 grid grid-cols-2 gap-5 md:grid-cols-3 lg:grid-cols-4">
+            {ATTORNEYS.slice(0, 4).map((a, i) => {
+              const Icon = benchIcons[i] ?? Scale;
+              return (
               <Reveal key={a.slug} delay={i * 100}>
-                <TiltCard className="h-full overflow-hidden bg-background" max={6}>
-                  <div className="overflow-hidden">
-                    <img
-                      src={ATTORNEY_PHOTOS[a.slug]}
-                      alt={`Portrait of ${a.name}, ${a.role} at Equity Chambers`}
-                      width={800}
-                      height={1000}
-                      loading="lazy"
-                      className="aspect-[4/5] w-full object-cover transition-transform duration-[1200ms] ease-out hover:scale-105"
-                    />
-                  </div>
-                  <div className="p-8">
-                    <h3 className="text-2xl text-foreground">{a.name}</h3>
-                    <p className="mt-1 text-sm text-muted-foreground">{a.role}</p>
-                    <p className="mt-4 text-sm leading-relaxed text-foreground">{a.bio}</p>
-                  </div>
-                </TiltCard>
+                <article className="group h-full min-h-56 border border-border bg-background p-5 transition-all duration-500 lg:hover:-translate-y-1 lg:hover:border-accent/60 lg:hover:shadow-lg sm:p-7">
+                  <span className="grid size-10 place-items-center border border-accent/40 text-accent transition-colors duration-500 lg:group-hover:bg-accent lg:group-hover:text-accent-foreground">
+                    <Icon aria-hidden="true" className="size-5" />
+                  </span>
+                  <h3 className="mt-6 text-xl leading-tight text-foreground sm:text-2xl">{a.name}</h3>
+                  <p className="mt-3 line-clamp-2 text-sm leading-relaxed text-muted-foreground">
+                    {a.role}. {a.focus} counsel for consequential Nigerian matters.
+                  </p>
+                </article>
               </Reveal>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>
 
       <FounderBook />
+
+      <div className="py-20">
+        <HeroSlider />
+      </div>
 
       <section className="mx-auto max-w-6xl px-6 py-24">
         <Reveal>
@@ -144,9 +165,6 @@ function Index() {
               <p className="rule-label text-accent">Notable Cases</p>
               <h2 className="mt-3 text-4xl text-foreground">Representative results</h2>
             </div>
-            <Link to="/notable-cases" className="story-link text-sm text-muted-foreground">
-              Full record
-            </Link>
           </div>
         </Reveal>
         <Reveal delay={120} className="mt-10">
@@ -164,12 +182,6 @@ function Index() {
             <p className="mt-6 text-sm text-ink-foreground/70">
               {TESTIMONIALS[0]!.author} — {TESTIMONIALS[0]!.org}
             </p>
-            <Link
-              to="/testimonials"
-              className="mt-10 inline-block border-b border-accent pb-1 text-sm text-accent transition-opacity hover:opacity-80"
-            >
-              More client accounts
-            </Link>
           </Reveal>
         </div>
       </section>
