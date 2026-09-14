@@ -218,6 +218,12 @@
   box-shadow: 0 28px 50px color-mix(in oklab, var(--background) 58%, transparent);
 }
 
+.book-stage:not([data-open="true"]) .book-back-cover,
+.book-stage:not([data-open="true"]) .book-page-block {
+  left: 50%;
+  width: 47%;
+}
+
 .book-page-block {
   inset: 6% 3.8% 4%;
   overflow: hidden;
@@ -243,7 +249,11 @@
   background: var(--color-parchment);
   transform: translateZ(2px);
   box-shadow: inset 0 0 28px color-mix(in oklab, var(--foreground) 10%, transparent);
+  opacity: 0;
+  transition: opacity 400ms ease 320ms;
 }
+
+.book-stage[data-open="true"] .book-spread { opacity: 1; }
 
 .book-page {
   position: relative;
