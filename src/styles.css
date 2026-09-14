@@ -154,3 +154,228 @@
     transition-duration: 0.001ms !important;
   }
 }
+
+/* Tactile About book: all surfaces remain tied to the site's semantic palette. */
+.book-stage {
+  position: relative;
+  margin-inline: auto;
+  width: min(100%, 64rem);
+  perspective: 1800px;
+  perspective-origin: 50% 42%;
+}
+
+.book-object {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border: 0;
+  padding: 0;
+  color: var(--color-foreground);
+  background: transparent;
+  cursor: pointer;
+  transform-style: preserve-3d;
+  transform: rotateX(11deg) rotateZ(-1deg) scale(0.88);
+  transition: transform 1800ms cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.book-stage[data-open="true"] .book-object {
+  transform: rotateX(5deg) rotateZ(0deg) scale(1);
+}
+
+.book-ground-shadow {
+  position: absolute;
+  inset: 15% 5% 0;
+  background: color-mix(in oklab, var(--background) 75%, transparent);
+  filter: blur(34px);
+  transform: translate3d(0, 18%, -44px) scale(0.82);
+  transition: transform 1800ms cubic-bezier(0.19, 1, 0.22, 1), opacity 1200ms ease;
+  opacity: 0.72;
+}
+
+.book-stage[data-open="true"] .book-ground-shadow {
+  transform: translate3d(0, 25%, -44px) scale(1.05);
+  opacity: 0.92;
+}
+
+.book-back-cover,
+.book-page-block,
+.book-spread,
+.book-front-cover {
+  position: absolute;
+  inset: 5% 3%;
+  display: block;
+  transform-style: preserve-3d;
+  border-radius: 0.35rem 0.65rem 0.65rem 0.35rem;
+}
+
+.book-back-cover {
+  background:
+    repeating-linear-gradient(90deg, transparent 0 3px, color-mix(in oklab, var(--brass) 8%, transparent) 3px 4px),
+    var(--color-ink);
+  border: 1px solid color-mix(in oklab, var(--brass) 52%, transparent);
+  transform: translateZ(-20px);
+  box-shadow: 0 28px 50px color-mix(in oklab, var(--background) 58%, transparent);
+}
+
+.book-page-block {
+  inset: 6% 3.8% 4%;
+  overflow: hidden;
+  border-radius: 0.25rem 0.55rem 0.55rem 0.25rem;
+  background: var(--color-parchment);
+  border-right: 8px solid color-mix(in oklab, var(--parchment) 72%, var(--foreground));
+  border-bottom: 10px solid color-mix(in oklab, var(--parchment) 78%, var(--foreground));
+  transform: translateZ(-5px);
+}
+
+.book-page-lines {
+  position: absolute;
+  inset: auto 0 0;
+  height: 10px;
+  background: repeating-linear-gradient(0deg, color-mix(in oklab, var(--foreground) 22%, transparent) 0 1px, transparent 1px 3px);
+}
+
+.book-spread {
+  inset: 6% 3.8% 6%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  overflow: hidden;
+  background: var(--color-parchment);
+  transform: translateZ(2px);
+  box-shadow: inset 0 0 28px color-mix(in oklab, var(--foreground) 10%, transparent);
+}
+
+.book-page {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  overflow: hidden;
+  background:
+    repeating-linear-gradient(0deg, transparent 0 4px, color-mix(in oklab, var(--foreground) 2%, transparent) 4px 5px),
+    var(--color-parchment);
+}
+
+.book-page-left {
+  align-items: center;
+  padding: 5% 7% 4% 8%;
+  border-radius: 0.25rem 0 0 0.25rem;
+  box-shadow: inset -22px 0 26px -22px color-mix(in oklab, var(--foreground) 52%, transparent);
+}
+
+.book-page-right {
+  justify-content: center;
+  padding: 7% 8% 5% 9%;
+  text-align: left;
+  border-radius: 0 0.25rem 0.25rem 0;
+  box-shadow: inset 22px 0 26px -22px color-mix(in oklab, var(--foreground) 52%, transparent);
+}
+
+.book-page-number {
+  position: absolute;
+  bottom: 2.5%;
+  left: 50%;
+  color: var(--color-muted-foreground);
+  font-family: var(--font-display);
+  font-size: 0.65rem;
+}
+
+.book-portrait-frame {
+  display: block;
+  width: 73%;
+  height: 76%;
+  overflow: hidden;
+  border: 4px double color-mix(in oklab, var(--accent) 72%, var(--foreground));
+  box-shadow: 0 10px 18px color-mix(in oklab, var(--foreground) 18%, transparent);
+}
+
+.book-founder-name,
+.book-chapter {
+  display: block;
+  font-family: var(--font-display);
+}
+
+.book-founder-name { margin-top: 2%; font-size: clamp(1rem, 2.2vw, 1.75rem); }
+.book-founder-role,
+.book-kicker { color: var(--color-accent); font-size: 0.62rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.16em; }
+.book-chapter { margin-top: 2%; font-size: clamp(1.2rem, 3vw, 2.35rem); line-height: 1; }
+.book-copy { display: block; margin-top: 5%; color: var(--color-muted-foreground); font-size: clamp(0.68rem, 1.22vw, 0.94rem); line-height: 1.65; }
+.book-copy-mobile { display: none; }
+.book-flourish { align-self: center; margin-top: 4%; color: var(--color-accent); font-family: var(--font-display); font-size: 1.3rem; }
+
+.book-front-cover {
+  z-index: 4;
+  left: 50%;
+  width: 47%;
+  overflow: visible;
+  transform-origin: left center;
+  transform: translateZ(18px) rotateY(0deg);
+  transition: transform 2000ms cubic-bezier(0.19, 1, 0.22, 1), box-shadow 1500ms ease;
+  backface-visibility: hidden;
+  background:
+    repeating-linear-gradient(92deg, transparent 0 3px, color-mix(in oklab, var(--brass) 7%, transparent) 3px 4px),
+    linear-gradient(110deg, color-mix(in oklab, var(--ink) 82%, var(--foreground)), var(--color-ink));
+  border: 1px solid color-mix(in oklab, var(--brass) 55%, transparent);
+  border-left-width: 8px;
+  box-shadow: -9px 12px 24px color-mix(in oklab, var(--background) 42%, transparent);
+}
+
+.book-stage[data-open="true"] .book-front-cover {
+  transform: translateZ(18px) rotateY(-179deg);
+  box-shadow: 18px 18px 30px color-mix(in oklab, var(--background) 48%, transparent);
+}
+
+.book-front-cover::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  transform: rotateY(180deg) translateZ(1px);
+  backface-visibility: hidden;
+  background: var(--color-ink);
+  border: 1px solid color-mix(in oklab, var(--brass) 35%, transparent);
+}
+
+.book-cover-spine {
+  position: absolute;
+  inset: 0 auto 0 -11px;
+  width: 17px;
+  border-radius: 55% 0 0 55%;
+  background: color-mix(in oklab, var(--ink) 70%, var(--foreground));
+  box-shadow: inset -4px 0 5px color-mix(in oklab, var(--background) 38%, transparent), 3px 0 3px color-mix(in oklab, var(--brass) 30%, transparent);
+}
+
+.book-cover-frame {
+  position: absolute;
+  inset: 5%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid color-mix(in oklab, var(--brass) 68%, transparent);
+  color: var(--color-brass);
+}
+
+.book-cover-mark { display: grid; width: 3rem; height: 3rem; place-items: center; border: 1px solid var(--color-brass); border-radius: 50%; font-family: var(--font-display); }
+.book-cover-title { margin-top: 7%; font-family: var(--font-display); font-size: clamp(2rem, 5vw, 4.6rem); line-height: 1; }
+.book-cover-rule { width: 22%; height: 1px; margin-top: 6%; background: var(--color-brass); }
+.book-cover-subtitle { margin-top: 5%; font-size: 0.65rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.18em; }
+
+@media (max-width: 639px) {
+  .book-stage { width: calc(100% + 1rem); margin-left: -0.5rem; perspective: 1200px; }
+  .book-object { aspect-ratio: 1.3 / 1; transform: rotateX(8deg) scale(0.9); }
+  .book-stage[data-open="true"] .book-object { transform: rotateX(3deg) scale(1); }
+  .book-back-cover, .book-page-block, .book-spread, .book-front-cover { inset-block: 8%; }
+  .book-page-left { padding: 8% 5% 7% 6%; }
+  .book-page-right { padding: 8% 6% 7% 7%; }
+  .book-portrait-frame { width: 78%; height: 67%; border-width: 2px; }
+  .book-founder-name { font-size: 0.9rem; }
+  .book-founder-role, .book-kicker { font-size: 0.42rem; letter-spacing: 0.1em; }
+  .book-chapter { font-size: 1rem; line-height: 1.05; }
+  .book-copy-desktop { display: none; }
+  .book-copy-mobile { display: block; margin-top: 5%; font-size: 0.54rem; line-height: 1.43; }
+  .book-flourish { margin-top: 2%; font-size: 0.8rem; }
+  .book-cover-mark { width: 2rem; height: 2rem; font-size: 0.7rem; }
+  .book-cover-title { font-size: 2rem; }
+  .book-cover-subtitle { font-size: 0.4rem; letter-spacing: 0.12em; }
+}
