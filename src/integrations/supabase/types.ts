@@ -14,7 +14,57 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      site_content: {
+        Row: {
+          body: string | null
+          bullets: string | null
+          created_at: string
+          eyebrow: string | null
+          id: string
+          image_url: string | null
+          link_url: string | null
+          meta: string | null
+          page: string
+          section: string
+          sort_order: number
+          subtitle: string | null
+          title: string | null
+          updated_at: string
+        }
+        Insert: {
+          body?: string | null
+          bullets?: string | null
+          created_at?: string
+          eyebrow?: string | null
+          id?: string
+          image_url?: string | null
+          link_url?: string | null
+          meta?: string | null
+          page: string
+          section: string
+          sort_order?: number
+          subtitle?: string | null
+          title?: string | null
+          updated_at?: string
+        }
+        Update: {
+          body?: string | null
+          bullets?: string | null
+          created_at?: string
+          eyebrow?: string | null
+          id?: string
+          image_url?: string | null
+          link_url?: string | null
+          meta?: string | null
+          page?: string
+          section?: string
+          sort_order?: number
+          subtitle?: string | null
+          title?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
