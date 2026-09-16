@@ -2,8 +2,33 @@ import { useEffect, useRef, useState } from "react";
 import { RotateCcw } from "lucide-react";
 import founderPortrait from "@/assets/founder-oo-kalu.jpg";
 import { Button } from "@/components/ui/button";
+import { lines, text } from "@/lib/content.functions";
+import { useSiteContent } from "@/lib/use-content";
+
+const DEFAULT_COPY =
+  "O.O. Kalu founded the chambers on a simple conviction: consequential counsel must pair exacting advocacy with an intimate understanding of the institutions shaping Nigerian enterprise. From one Abuja office, that conviction grew into a national practice serving boards, families, and public institutions across generations. Our mission remains to develop lawyers of uncommon judgment, strengthen the rule of law, and help ambitious Nigerian businesses build with confidence across Africa.";
 
 export function FounderBook() {
+  const { block } = useSiteContent();
+  const row = block("home", "foundation");
+  const firm = block("global", "firm");
+
+  const eyebrow = text(row?.eyebrow, "Our Foundation");
+  const heading = text(row?.title, "A legacy written for what comes next");
+  const coverTitle = text(row?.subtitle, "About Us");
+  const portrait = row?.image_url?.trim() ? row.image_url : founderPortrait;
+  const founderName = text(row?.meta, "O.O. Kalu, Esq.");
+  const copy = text(row?.body, DEFAULT_COPY);
+  const founderRole = lines(row?.bullets)[0] ?? "Founder · 1994";
+  const firmName = text(firm?.title, "O.O. Kalu & Associates");
+  const initials = firmName
+    .replace(/[^A-Za-z ]/g, "")
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((word) => word[0]?.toUpperCase() ?? "")
+    .join("");
+
   const sectionRef = useRef<HTMLElement | null>(null);
   const [opened, setOpened] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(false);
@@ -46,8 +71,8 @@ export function FounderBook() {
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <div className="grid grid-cols-[minmax(0,1fr)_auto] items-end gap-5">
           <div className="min-w-0">
-            <p className="rule-label text-accent">Our Foundation</p>
-            <h2 className="mt-3 max-w-2xl text-4xl md:text-5xl">A legacy written for what comes next</h2>
+            <p className="rule-label text-accent">{eyebrow}</p>
+            <h2 className="mt-3 max-w-2xl text-4xl md:text-5xl">{heading}</h2>
           </div>
           <Button
             type="button"
@@ -83,45 +108,33 @@ export function FounderBook() {
                 <span className="book-page-number">I</span>
                 <span className="book-portrait-frame">
                   <img
-                    src={founderPortrait}
-                    alt="Portrait of O.O. Kalu, Esq., founder of Equity Chambers"
-                    width={1024}
-                    height={1280}
-                    loading="lazy"
+                    src={portrait}
+                    alt={`Portrait of ${founderName}, founder of ${firmName}`}
                     className="h-full w-full object-cover object-top"
                   />
                 </span>
-                <span className="book-founder-name">O.O. Kalu, Esq.</span>
-                <span className="book-founder-role">Founder · 1994</span>
+                <span className="book-founder-name">{founderName}</span>
+                <span className="book-founder-role">{founderRole}</span>
               </span>
 
               <span className="book-page book-page-right">
                 <span className="book-page-number">II</span>
-                <span className="book-kicker">Equity Chambers</span>
-                <span className="book-chapter">Principle before precedent</span>
-                <span className="book-copy book-copy-desktop">
-                  O.O. Kalu founded Equity Chambers on a simple conviction: consequential counsel must pair exacting
-                  advocacy with an intimate understanding of the institutions shaping Nigerian enterprise. From one
-                  Abuja office, that conviction grew into a national practice serving boards, families, and public
-                  institutions across generations. Our mission remains to develop lawyers of uncommon judgment,
-                  strengthen the rule of law, and help ambitious Nigerian businesses build with confidence across Africa.
+                <span className="book-kicker">{firmName}</span>
+                <span className="book-chapter">{coverTitle}</span>
+                <span className="book-copy">{copy}</span>
+                <span className="book-flourish" aria-hidden="true">
+                  §
                 </span>
-                <span className="book-copy book-copy-mobile">
-                  Founded by O.O. Kalu in 1994, Equity Chambers pairs exacting advocacy with a deep understanding of
-                  Nigerian enterprise. We develop lawyers of uncommon judgment, strengthen the rule of law, and help
-                  ambitious businesses build confidently across Africa.
-                </span>
-                <span className="book-flourish" aria-hidden="true">§</span>
               </span>
             </span>
 
             <span className="book-front-cover" aria-hidden="true">
               <span className="book-cover-spine" />
               <span className="book-cover-frame">
-                <span className="book-cover-mark">EC</span>
-                <span className="book-cover-title">About Us</span>
+                <span className="book-cover-mark">{initials || "OK"}</span>
+                <span className="book-cover-title">{coverTitle}</span>
                 <span className="book-cover-rule" />
-                <span className="book-cover-subtitle">Equity Chambers · Nigeria</span>
+                <span className="book-cover-subtitle">{firmName} · Nigeria</span>
               </span>
             </span>
           </button>

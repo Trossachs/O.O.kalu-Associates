@@ -12,6 +12,8 @@ import { useEffect, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { SiteHeader, SiteFooter } from "@/components/site-chrome";
+import { supabase } from "@/integrations/supabase/client";
+import { contentQueryOptions } from "@/lib/content.functions";
 
 function NotFoundComponent() {
   return (
@@ -78,13 +80,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Equity Chambers — Counsel for Consequential Matters" },
+      { title: "O.O. Kalu & Associates — Counsel for Consequential Matters" },
       {
         name: "description",
         content:
           "A Nigerian law firm in Abuja, Lagos, and Port Harcourt advising boards, institutions, and families in consequential matters.",
       },
-      { name: "author", content: "Equity Chambers" },
+      { name: "author", content: "O.O. Kalu & Associates" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -102,6 +104,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
     ],
   }),
+  loader: ({ context }) => context.queryClient.ensureQueryData(contentQueryOptions),
   shellComponent: RootShell,
   component: RootComponent,
   notFoundComponent: NotFoundComponent,
@@ -124,6 +127,19 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+
+  useEffect(() => {
+    const channel = supabase
+      .channel("site-content-live")
+      .on("postgres_changes", { event: "*", schema: "public", table: "site_content" }, () => {
+        queryClient.invalidateQueries({ queryKey: ["site-content"] });
+      })
+      .subscribe();
+
+    return () => {
+      void supabase.removeChannel(channel);
+    };
+  }, [queryClient]);
 
   return (
     <QueryClientProvider client={queryClient}>

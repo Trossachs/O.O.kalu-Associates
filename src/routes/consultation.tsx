@@ -2,19 +2,21 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { PageHeader } from "@/components/site-chrome";
 import { FIRM, PRACTICE_AREAS } from "@/lib/firm-data";
+import { text } from "@/lib/content.functions";
+import { useSiteContent } from "@/lib/use-content";
 import heroConsultation from "@/assets/hero-consultation.jpg";
 
 export const Route = createFileRoute("/consultation")({
   head: () => ({
     meta: [
-      { title: "Book a Consultation — Equity Chambers Nigeria" },
+      { title: "Book a Consultation — O.O. Kalu & Associates Nigeria" },
       {
         name: "description",
         content:
-          "Request a confidential consultation with an Equity Chambers partner in Abuja, Lagos, or Port Harcourt. Describe your matter and we respond within one business day.",
+          "Request a confidential consultation with an O.O. Kalu & Associates partner in Abuja, Lagos, or Port Harcourt. Describe your matter and we respond within one business day.",
       },
-      { property: "og:title", content: "Book a Consultation — Equity Chambers Nigeria" },
-      { property: "og:description", content: "Confidential consultations with the partners of Equity Chambers." },
+      { property: "og:title", content: "Book a Consultation — O.O. Kalu & Associates Nigeria" },
+      { property: "og:description", content: "Confidential consultations with the partners of O.O. Kalu & Associates." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -25,6 +27,8 @@ export const Route = createFileRoute("/consultation")({
 const TIMES = ["09:00", "10:30", "13:00", "14:30", "16:00"];
 
 function ConsultationPage() {
+  const { block } = useSiteContent();
+  const header = block("consultation", "header");
   const [submitted, setSubmitted] = useState<null | { name: string; date: string; time: string }>(null);
   const [time, setTime] = useState(TIMES[1]!);
 
@@ -45,10 +49,13 @@ function ConsultationPage() {
   return (
     <div>
       <PageHeader
-        eyebrow="Consultation"
-        title="Tell us what happened"
-        intro="Initial consultations are confidential and carry no obligation. A partner reviews every request personally. All times are West Africa Time (WAT)."
-        image={heroConsultation}
+        eyebrow={text(header?.eyebrow, "Consultation")}
+        title={text(header?.title, "Tell us what happened")}
+        intro={text(
+          header?.body,
+          "Initial consultations are confidential and carry no obligation. A partner reviews every request personally. All times are West Africa Time (WAT).",
+        )}
+        image={text(header?.image_url, heroConsultation)}
         imageAlt="Chambers meeting room in Abuja with brass detailing and evening light"
       />
 

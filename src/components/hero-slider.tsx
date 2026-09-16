@@ -5,7 +5,7 @@ import slideLibrary from "@/assets/slide-library.jpg";
 import slideLagos from "@/assets/slide-lagos.jpg";
 import slideAbuja from "@/assets/slide-abuja.jpg";
 
-type Slide = {
+export type Slide = {
   image: string;
   alt: string;
   eyebrow: string;
@@ -19,7 +19,7 @@ const SLIDES: Slide[] = [
     alt: "Colonnaded Nigerian courthouse in Abuja lit at dusk",
     eyebrow: "Abuja · Lagos · Port Harcourt",
     title: "Counsel for the matters that decide the decade.",
-    body: "Equity Chambers represents boards, institutions, and families across Nigeria when the transaction is complicated, the exposure is real, and the outcome cannot be delegated.",
+    body: "O.O. Kalu & Associates represents boards, institutions, and families across Nigeria when the transaction is complicated, the exposure is real, and the outcome cannot be delegated.",
   },
   {
     image: slideLagos,
@@ -39,21 +39,22 @@ const SLIDES: Slide[] = [
 
 const INTERVAL = 7000;
 
-export function HeroSlider() {
+export function HeroSlider({ slides }: { slides?: Slide[] | undefined }) {
+  const items = slides && slides.length ? slides : SLIDES;
   const [index, setIndex] = useState(0);
   const [dir, setDir] = useState(1);
   const timer = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const go = useCallback((next: number, direction: number) => {
     setDir(direction);
-    setIndex(((next % SLIDES.length) + SLIDES.length) % SLIDES.length);
+    setIndex(((next % items.length) + items.length) % items.length);
   }, []);
 
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     timer.current = setInterval(() => {
       setDir(1);
-      setIndex((i) => (i + 1) % SLIDES.length);
+      setIndex((i) => (i + 1) % items.length);
     }, INTERVAL);
     return () => {
       if (timer.current) clearInterval(timer.current);
@@ -64,9 +65,9 @@ export function HeroSlider() {
     <section
       className="relative isolate overflow-hidden bg-ink text-ink-foreground [perspective:1600px]"
       aria-roledescription="carousel"
-      aria-label="Equity Chambers introduction"
+      aria-label="O.O. Kalu & Associates introduction"
     >
-      {SLIDES.map((s, i) => {
+      {items.map((s, i) => {
         const active = i === index;
         return (
           <div
@@ -99,7 +100,7 @@ export function HeroSlider() {
       />
 
       <div className="mx-auto max-w-6xl px-6 py-32 lg:py-44">
-        {SLIDES.map((s, i) => {
+        {items.map((s, i) => {
           const active = i === index;
           return (
             <div
@@ -155,7 +156,7 @@ export function HeroSlider() {
             →
           </button>
           <div className="flex items-center gap-3">
-            {SLIDES.map((s, i) => (
+            {items.map((s, i) => (
               <button
                 key={s.title}
                 type="button"
