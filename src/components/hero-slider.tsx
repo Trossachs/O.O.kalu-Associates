@@ -5,7 +5,7 @@ import slideLibrary from "@/assets/slide-library.jpg";
 import slideLagos from "@/assets/slide-lagos.jpg";
 import slideAbuja from "@/assets/slide-abuja.jpg";
 
-type Slide = {
+export type Slide = {
   image: string;
   alt: string;
   eyebrow: string;
@@ -39,21 +39,22 @@ const SLIDES: Slide[] = [
 
 const INTERVAL = 7000;
 
-export function HeroSlider() {
+export function HeroSlider({ slides }: { slides?: Slide[] }) {
+  const items = slides && slides.length ? slides : SLIDES;
   const [index, setIndex] = useState(0);
   const [dir, setDir] = useState(1);
   const timer = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const go = useCallback((next: number, direction: number) => {
     setDir(direction);
-    setIndex(((next % SLIDES.length) + SLIDES.length) % SLIDES.length);
+    setIndex(((next % items.length) + items.length) % items.length);
   }, []);
 
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     timer.current = setInterval(() => {
       setDir(1);
-      setIndex((i) => (i + 1) % SLIDES.length);
+      setIndex((i) => (i + 1) % items.length);
     }, INTERVAL);
     return () => {
       if (timer.current) clearInterval(timer.current);
@@ -66,7 +67,7 @@ export function HeroSlider() {
       aria-roledescription="carousel"
       aria-label="Equity Chambers introduction"
     >
-      {SLIDES.map((s, i) => {
+      {items.map((s, i) => {
         const active = i === index;
         return (
           <div
@@ -99,7 +100,7 @@ export function HeroSlider() {
       />
 
       <div className="mx-auto max-w-6xl px-6 py-32 lg:py-44">
-        {SLIDES.map((s, i) => {
+        {items.map((s, i) => {
           const active = i === index;
           return (
             <div
@@ -155,7 +156,7 @@ export function HeroSlider() {
             →
           </button>
           <div className="flex items-center gap-3">
-            {SLIDES.map((s, i) => (
+            {items.map((s, i) => (
               <button
                 key={s.title}
                 type="button"
