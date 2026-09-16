@@ -292,8 +292,10 @@
 
 .book-portrait-frame {
   display: block;
-  width: 73%;
-  height: 76%;
+  flex: 0 0 auto;
+  width: 72%;
+  max-height: 74%;
+  aspect-ratio: 4 / 5;
   overflow: hidden;
   border: 4px double color-mix(in oklab, var(--accent) 72%, var(--foreground));
   box-shadow: 0 10px 18px color-mix(in oklab, var(--foreground) 18%, transparent);
@@ -310,7 +312,6 @@
 .book-kicker { color: var(--color-accent); font-size: 0.62rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.16em; }
 .book-chapter { margin-top: 2%; font-size: clamp(1.2rem, 3vw, 2.35rem); line-height: 1; }
 .book-copy { display: block; margin-top: 5%; color: var(--color-muted-foreground); font-size: clamp(0.68rem, 1.22vw, 0.94rem); line-height: 1.65; }
-.book-copy-mobile { display: none; }
 .book-flourish { align-self: center; margin-top: 4%; color: var(--color-accent); font-family: var(--font-display); font-size: 1.3rem; }
 
 .book-front-cover {
@@ -378,12 +379,19 @@
   .book-back-cover, .book-page-block, .book-spread, .book-front-cover { inset-block: 8%; }
   .book-page-left { padding: 8% 5% 7% 6%; }
   .book-page-right { padding: 8% 6% 7% 7%; }
-  .book-portrait-frame { width: 78%; height: 67%; border-width: 2px; }
+  .book-portrait-frame { width: 66%; max-height: 62%; border-width: 2px; }
   .book-founder-name { font-size: 0.9rem; }
   .book-founder-role, .book-kicker { font-size: 0.42rem; letter-spacing: 0.1em; }
   .book-chapter { font-size: 1rem; line-height: 1.05; }
-  .book-copy-desktop { display: none; }
-  .book-copy-mobile { display: block; margin-top: 5%; font-size: 0.54rem; line-height: 1.43; }
+  .book-copy {
+    display: -webkit-box;
+    margin-top: 5%;
+    overflow: hidden;
+    font-size: 0.54rem;
+    line-height: 1.43;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 9;
+  }
   .book-flourish { margin-top: 2%; font-size: 0.8rem; }
   .book-cover-mark { width: 2rem; height: 2rem; font-size: 0.7rem; }
   .book-cover-title { font-size: 2rem; }
