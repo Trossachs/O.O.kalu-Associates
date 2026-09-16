@@ -19,7 +19,7 @@ const SLIDES: Slide[] = [
     alt: "Colonnaded Nigerian courthouse in Abuja lit at dusk",
     eyebrow: "Abuja · Lagos · Port Harcourt",
     title: "Counsel for the matters that decide the decade.",
-    body: "Equity Chambers represents boards, institutions, and families across Nigeria when the transaction is complicated, the exposure is real, and the outcome cannot be delegated.",
+    body: "O.O. Kalu & Associates represents boards, institutions, and families across Nigeria when the transaction is complicated, the exposure is real, and the outcome cannot be delegated.",
   },
   {
     image: slideLagos,
@@ -65,7 +65,7 @@ export function HeroSlider({ slides }: { slides?: Slide[] | undefined }) {
     <section
       className="relative isolate overflow-hidden bg-ink text-ink-foreground [perspective:1600px]"
       aria-roledescription="carousel"
-      aria-label="Equity Chambers introduction"
+      aria-label="O.O. Kalu & Associates introduction"
     >
       {items.map((s, i) => {
         const active = i === index;
