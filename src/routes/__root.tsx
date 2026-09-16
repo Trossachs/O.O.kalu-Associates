@@ -104,6 +104,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
     ],
   }),
+  loader: ({ context }) => context.queryClient.ensureQueryData(contentQueryOptions),
   shellComponent: RootShell,
   component: RootComponent,
   notFoundComponent: NotFoundComponent,
