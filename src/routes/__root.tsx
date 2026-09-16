@@ -80,13 +80,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Equity Chambers — Counsel for Consequential Matters" },
+      { title: "O.O. Kalu & Associates — Counsel for Consequential Matters" },
       {
         name: "description",
         content:
           "A Nigerian law firm in Abuja, Lagos, and Port Harcourt advising boards, institutions, and families in consequential matters.",
       },
-      { name: "author", content: "Equity Chambers" },
+      { name: "author", content: "O.O. Kalu & Associates" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
