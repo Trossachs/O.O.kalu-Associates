@@ -39,7 +39,7 @@ const SLIDES: Slide[] = [
 
 const INTERVAL = 7000;
 
-export function HeroSlider({ slides }: { slides?: Slide[] }) {
+export function HeroSlider({ slides }: { slides?: Slide[] | undefined }) {
   const items = slides && slides.length ? slides : SLIDES;
   const [index, setIndex] = useState(0);
   const [dir, setDir] = useState(1);
