@@ -1,6 +1,8 @@
 import { Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { FIRM } from "@/lib/firm-data";
+import { useSiteContent } from "@/lib/use-content";
+import { text } from "@/lib/content.functions";
 import { Reveal, ScrollProgress, ZoomImage } from "@/components/motion";
 import { Button } from "@/components/ui/button";
 
@@ -11,7 +13,21 @@ const NAV = [
   { to: "/publications", label: "Publications" },
 ] as const;
 
+function useFirm() {
+  const { block } = useSiteContent();
+  const row = block("global", "firm");
+  const contact = (row?.meta ?? `${FIRM.phone} · ${FIRM.email}`).split("·").map((v) => v.trim());
+  return {
+    name: text(row?.title, FIRM.name),
+    tagline: text(row?.subtitle, FIRM.tagline),
+    address: text(row?.body, FIRM.address),
+    phone: contact[0] ?? FIRM.phone,
+    email: contact[1] ?? FIRM.email,
+  };
+}
+
 export function SiteHeader() {
+  const firm = useFirm();
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
@@ -35,7 +51,8 @@ export function SiteHeader() {
         }`}
       >
         <Link to="/" className="flex items-baseline gap-3">
-          <span className="font-display text-2xl tracking-tight text-foreground">{FIRM.name}</span>
+          <span aria-hidden="true" className="text-xl leading-none">⚖️</span>
+          <span className="font-display text-xl tracking-tight text-foreground sm:text-2xl">{firm.name}</span>
           <span className="hidden rule-label text-accent sm:inline">Est. {FIRM.founded}</span>
         </Link>
 
@@ -93,25 +110,27 @@ export function SiteHeader() {
 }
 
 export function SiteFooter() {
+  const firm = useFirm();
+
   return (
     <footer className="mt-24 bg-ink text-ink-foreground">
       <div className="mx-auto grid max-w-6xl gap-10 px-6 py-16 md:grid-cols-3">
         <div>
-          <p className="font-display text-2xl">{FIRM.name}</p>
-          <p className="mt-3 max-w-xs text-sm text-ink-foreground/70">{FIRM.tagline}</p>
+          <p className="font-display text-2xl">⚖️ {firm.name}</p>
+          <p className="mt-3 max-w-xs text-sm text-ink-foreground/70">{firm.tagline}</p>
         </div>
         <div>
           <p className="rule-label text-accent">Offices</p>
           <address className="mt-3 space-y-3 text-sm not-italic text-ink-foreground/80">
-            {FIRM.offices.map((o) => (
+            {FIRM.offices.map((o, i) => (
               <div key={o.city}>
                 <p className="text-xs uppercase tracking-widest text-ink-foreground/60">{o.city}</p>
-                <p>{o.detail}</p>
+                <p>{i === 0 ? firm.address : o.detail}</p>
               </div>
             ))}
             <div>
-              <p>{FIRM.phone}</p>
-              <p>{FIRM.email}</p>
+              <p>{firm.phone}</p>
+              <p>{firm.email}</p>
             </div>
           </address>
         </div>
@@ -129,7 +148,7 @@ export function SiteFooter() {
         </div>
       </div>
       <div className="border-t border-white/10 py-5 text-center text-xs text-ink-foreground/50">
-        © {new Date().getFullYear()} {FIRM.name}. Regulated by the Nigerian Bar Association and the Rules of Professional
+        © {new Date().getFullYear()} {firm.name}. Regulated by the Nigerian Bar Association and the Rules of Professional
         Conduct. Prior results do not guarantee a similar outcome.
       </div>
     </footer>
