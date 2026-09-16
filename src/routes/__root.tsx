@@ -125,6 +125,19 @@ function RootShell({ children }: { children: ReactNode }) {
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
 
+  useEffect(() => {
+    const channel = supabase
+      .channel("site-content-live")
+      .on("postgres_changes", { event: "*", schema: "public", table: "site_content" }, () => {
+        queryClient.invalidateQueries({ queryKey: ["site-content"] });
+      })
+      .subscribe();
+
+    return () => {
+      void supabase.removeChannel(channel);
+    };
+  }, [queryClient]);
+
   return (
     <QueryClientProvider client={queryClient}>
       <div className="flex min-h-screen flex-col">
