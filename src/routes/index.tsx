@@ -17,12 +17,12 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "O.O. Kalu & Associates is a Nigerian law firm in Abuja, Lagos, and Port Harcourt advising boards, institutions, and families on transactions, litigation, arbitration, energy, and regulatory matters.",
+          "O.O. Kalu & Associates is a Nigerian law firm based in Owerri, Imo State, advising boards, institutions, and families on transactions, litigation, arbitration, energy, and regulatory matters.",
       },
       { property: "og:title", content: "O.O. Kalu & Associates — Nigerian Commercial & Dispute Resolution Law Firm" },
       {
         property: "og:description",
-        content: "A Nigerian firm of advocates and transactional counsel, practising since 1994.",
+        content: "A Nigerian firm of advocates and transactional counsel based in Owerri, Imo State.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -47,7 +47,7 @@ function Index() {
   const stats = statRows.length
     ? statRows.map((row) => ({ k: text(row.subtitle, ""), v: text(row.title, "") }))
     : [
-        { k: "Years in practice", v: `${new Date().getFullYear() - FIRM.founded}` },
+        { k: "Legal tradition", v: "Established" },
         { k: "Matters led to judgment or award", v: "180+" },
         { k: "Transaction value advised", v: "$4.1B" },
       ];
@@ -118,7 +118,7 @@ function Index() {
       <section className="relative isolate flex min-h-[70vh] items-center justify-center overflow-hidden bg-ink text-center text-ink-foreground lg:h-screen">
         <img
           src={text(hero?.image_url, facade)}
-          alt="The chambers building in Abuja"
+          alt="The O.O. Kalu & Associates chambers building"
           loading="eager"
           className="absolute inset-0 -z-20 h-full w-full object-cover"
         />
