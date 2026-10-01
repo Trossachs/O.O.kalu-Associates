@@ -1,10 +1,10 @@
-import { useQuery } from "@tanstack/react-query";
+import { useSuspenseQuery } from "@tanstack/react-query";
 
 import { contentQueryOptions, many, one, type ContentRow } from "./content.functions";
 
 /** Reads the editable site content, primed during SSR by the root loader. */
 export function useSiteContent() {
-  const { data } = useQuery(contentQueryOptions);
+  const { data } = useSuspenseQuery(contentQueryOptions);
   const rows: ContentRow[] = data ?? [];
 
   return {
