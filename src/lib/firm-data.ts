@@ -1,15 +1,12 @@
 export const FIRM = {
-  name: "Equity Chambers",
+  name: "O.O. KALU & ASSOCIATES",
   tagline: "Counsel for consequential matters",
   phone: "+234 (0) 9 291 0142",
   email: "chambers@equitychambers.ng",
-  address: "Plot 1145 Adetokunbo Ademola Crescent, Wuse II, Abuja, FCT",
+  address: "Owerri, Imo State, Nigeria",
   offices: [
-    { city: "Abuja", detail: "Plot 1145 Adetokunbo Ademola Crescent, Wuse II, Abuja, FCT" },
-    { city: "Lagos", detail: "18th Floor, Kingsway Tower, Ikoyi, Lagos" },
-    { city: "Port Harcourt", detail: "Plot 24 Aba Road, GRA Phase II, Port Harcourt, Rivers State" },
+    { city: "Owerri, Imo State", detail: "Owerri, Imo State, Nigeria" },
   ],
-  founded: 1994,
 };
 
 export type PracticeArea = {
