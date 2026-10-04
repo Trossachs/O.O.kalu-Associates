@@ -84,7 +84,7 @@ export function Reveal({
   };
 
   return (
-    <Tag ref={ref as never} style={style} className={cn("will-change-transform", className)}>
+    <Tag id={id} ref={ref as never} style={style} className={cn("will-change-transform", className)}>
       {children}
     </Tag>
   );
