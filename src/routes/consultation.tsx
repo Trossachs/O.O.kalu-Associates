@@ -5,6 +5,7 @@ import { FIRM, PRACTICE_AREAS } from "@/lib/firm-data";
 import { text } from "@/lib/content.functions";
 import { useSiteContent } from "@/lib/use-content";
 import heroConsultation from "@/assets/hero-consultation.jpg";
+import { submitMessage } from "@/lib/messages.functions";
 
 export const Route = createFileRoute("/consultation")({
   head: () => ({
@@ -178,11 +179,13 @@ function ConsultationPage() {
                 or highly sensitive details until an engagement is confirmed.
               </p>
 
+              {sendError ? <p className="text-sm text-destructive">{sendError}</p> : null}
               <button
                 type="submit"
-                className="rounded-sm bg-ink px-7 py-3 text-sm text-ink-foreground transition-colors hover:bg-ink/90"
+                disabled={sending}
+                className="rounded-sm bg-ink px-7 py-3 text-sm text-ink-foreground transition-colors hover:bg-ink/90 disabled:opacity-60"
               >
-                Request consultation
+                {sending ? "Sending…" : "Request consultation"}
               </button>
             </form>
           )}

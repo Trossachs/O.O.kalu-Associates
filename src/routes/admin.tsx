@@ -7,7 +7,9 @@ import { Loader2, LogOut, Plus, Save, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   adminDeleteContent,
+  adminDeleteMessage,
   adminListContent,
+  adminListMessages,
   adminLogin,
   adminLogout,
   adminSaveContent,
@@ -160,6 +162,17 @@ function Dashboard({ email }: { email: string | null }) {
       </div>
 
       <div className="mt-8 flex flex-wrap gap-2">
+        <button
+          type="button"
+          onClick={() => setActivePage(MESSAGES_TAB)}
+          className={`rounded-sm border px-3 py-1.5 text-xs uppercase tracking-widest transition-colors ${
+            currentPage === MESSAGES_TAB
+              ? "border-accent bg-accent text-accent-foreground"
+              : "border-border text-muted-foreground hover:border-accent/60"
+          }`}
+        >
+          ✉️ Messages
+        </button>
         {pages.map((page) => (
           <button
             key={page}
@@ -171,24 +184,93 @@ function Dashboard({ email }: { email: string | null }) {
                 : "border-border text-muted-foreground hover:border-accent/60"
             }`}
           >
-            {page}
+            {page === "publications" ? "blog" : page}
           </button>
         ))}
       </div>
 
-      {rows.isLoading ? (
-        <div className="mt-10 flex items-center gap-2 text-sm text-muted-foreground">
-          <Loader2 className="size-4 animate-spin" /> Loading content…
-        </div>
-      ) : null}
-      {rows.error ? <p className="mt-10 text-sm text-destructive">{(rows.error as Error).message}</p> : null}
+      {currentPage === MESSAGES_TAB ? (
+        <MessagesInbox />
+      ) : (
+        <>
+          {rows.isLoading ? (
+            <div className="mt-10 flex items-center gap-2 text-sm text-muted-foreground">
+              <Loader2 className="size-4 animate-spin" /> Loading content…
+            </div>
+          ) : null}
+          {rows.error ? <p className="mt-10 text-sm text-destructive">{(rows.error as Error).message}</p> : null}
 
-      <div className="mt-8 space-y-6">
-        {pageRows.map((row) => (
-          <ContentCard key={row.id} row={row} onChanged={refresh} />
-        ))}
-        <NewSectionCard page={currentPage} onChanged={refresh} />
+          <div className="mt-8 space-y-6">
+            {pageRows.map((row) => (
+              <ContentCard key={row.id} row={row} onChanged={refresh} />
+            ))}
+            <NewSectionCard page={currentPage} onChanged={refresh} />
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
+const MESSAGES_TAB = "__messages";
+
+function MessagesInbox() {
+  const queryClient = useQueryClient();
+  const remove = useServerFn(adminDeleteMessage);
+  const messages = useQuery({ queryKey: ["admin-messages"], queryFn: () => adminListMessages() });
+  const del = useMutation({
+    mutationFn: (id: string) => remove({ data: { id } }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["admin-messages"] }),
+  });
+
+  if (messages.isLoading)
+    return (
+      <div className="mt-10 flex items-center gap-2 text-sm text-muted-foreground">
+        <Loader2 className="size-4 animate-spin" /> Loading messages…
       </div>
+    );
+  if (messages.error) return <p className="mt-10 text-sm text-destructive">{(messages.error as Error).message}</p>;
+  const list = messages.data ?? [];
+
+  return (
+    <div className="mt-8 space-y-4">
+      <p className="text-sm text-muted-foreground">
+        {list.length} message{list.length === 1 ? "" : "s"} from the consultation form
+      </p>
+      {list.length === 0 ? (
+        <p className="rounded-sm border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
+          No messages yet.
+        </p>
+      ) : null}
+      {list.map((m) => (
+        <article key={m.id} className="rounded-sm border border-border bg-background p-5 sm:p-6">
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div className="min-w-0">
+              <h2 className="text-lg text-foreground">{m.name}</h2>
+              <p className="break-all text-sm text-muted-foreground">
+                <a href={`mailto:${m.email}`} className="underline">{m.email}</a>
+                {m.phone ? ` · ${m.phone}` : ""}
+                {m.organization ? ` · ${m.organization}` : ""}
+              </p>
+            </div>
+            <time className="text-xs text-muted-foreground">{new Date(m.created_at).toLocaleString()}</time>
+          </div>
+          <p className="mt-2 text-xs uppercase tracking-widest text-accent">
+            {[m.practice, m.preferred_date, m.preferred_time].filter(Boolean).join(" · ")}
+          </p>
+          <p className="mt-3 whitespace-pre-wrap text-sm text-foreground">{m.message}</p>
+          <Button
+            variant="outline"
+            className="mt-4 text-destructive"
+            disabled={del.isPending}
+            onClick={() => {
+              if (window.confirm("Delete this message permanently?")) del.mutate(m.id);
+            }}
+          >
+            <Trash2 aria-hidden="true" /> Delete
+          </Button>
+        </article>
+      ))}
     </div>
   );
 }
