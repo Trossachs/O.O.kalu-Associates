@@ -41,7 +41,6 @@ function Index() {
   const benchIntro = block("home", "bench-intro");
   const casesIntro = block("home", "cases-intro");
   const pubIntro = block("home", "publications-intro");
-  const cta = block("home", "cta");
 
   const statRows = list("home", "stat");
   const stats = statRows.length

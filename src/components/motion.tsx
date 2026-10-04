@@ -60,8 +60,10 @@ export function Reveal({
   blur = 8,
   className,
   as: Tag = "div",
+  id,
 }: {
   children: ReactNode;
+  id?: string;
   delay?: number;
   y?: number;
   blur?: number;
