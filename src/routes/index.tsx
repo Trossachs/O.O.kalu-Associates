@@ -162,10 +162,19 @@ function Index() {
         <div className="mt-10 grid gap-px bg-border sm:grid-cols-2 lg:grid-cols-3">
           {areas.map((a, i) => (
             <Reveal key={a.slug} delay={i * 70}>
-              <TiltCard className="h-full bg-background p-8">
-                <h3 className="text-2xl text-foreground">{a.title}</h3>
-                <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{a.summary}</p>
-              </TiltCard>
+              <Link
+                to="/practice-areas"
+                hash={`area-${a.slug}`}
+                className="group block h-full focus-visible:outline-2 focus-visible:outline-accent"
+              >
+                <TiltCard className="h-full bg-background p-8 transition-colors group-hover:bg-parchment">
+                  <h3 className="text-2xl text-foreground">{a.title}</h3>
+                  <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{a.summary}</p>
+                  <span className="mt-5 inline-block text-xs uppercase tracking-widest text-accent">
+                    Learn more →
+                  </span>
+                </TiltCard>
+              </Link>
             </Reveal>
           ))}
         </div>
@@ -265,11 +274,11 @@ function Index() {
         <Reveal>
           <div className="flex flex-wrap items-end justify-between gap-6">
             <div>
-              <p className="rule-label text-accent">{text(pubIntro?.eyebrow, "Publications")}</p>
+              <p className="rule-label text-accent">{text(pubIntro?.eyebrow, "Blog")}</p>
               <h2 className="mt-3 text-4xl text-foreground">{text(pubIntro?.title, "Recent writing")}</h2>
             </div>
-            <Link to="/publications" className="story-link text-sm text-muted-foreground">
-              All publications
+            <Link to="/blog" className="story-link text-sm text-muted-foreground">
+              All blog posts
             </Link>
           </div>
         </Reveal>
@@ -283,27 +292,6 @@ function Index() {
               </TiltCard>
             </Reveal>
           ))}
-        </div>
-      </section>
-
-      <section className="border-t border-border bg-parchment">
-        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-8 px-6 py-20">
-          <Reveal>
-            <h2 className="max-w-xl text-4xl text-foreground">
-              {text(cta?.title, "Bring us the matter you cannot afford to lose.")}
-            </h2>
-            <p className="mt-4 max-w-lg text-sm text-muted-foreground">
-              {text(cta?.body, "Confidential consultations, reviewed by a partner, answered within one business day.")}
-            </p>
-          </Reveal>
-          <Reveal delay={120}>
-            <Link
-              to="/consultation"
-              className="inline-block rounded-sm bg-ink px-8 py-4 text-sm text-ink-foreground transition-transform duration-300 hover:-translate-y-0.5 hover:bg-ink/90"
-            >
-              Book a consultation
-            </Link>
-          </Reveal>
         </div>
       </section>
     </div>

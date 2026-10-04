@@ -10,7 +10,7 @@ const NAV = [
   { to: "/", label: "Home" },
   { to: "/practice-areas", label: "Practice Areas" },
   { to: "/attorneys", label: "Attorneys" },
-  { to: "/publications", label: "Publications" },
+  { to: "/blog", label: "Blog" },
 ] as const;
 
 function useFirm() {

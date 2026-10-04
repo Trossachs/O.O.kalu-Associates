@@ -57,7 +57,7 @@ function PracticeAreasPage() {
       <div className="mx-auto max-w-6xl px-6 py-20">
         <div className="grid gap-px bg-border md:grid-cols-2">
           {areas.map((area, i) => (
-            <Reveal as="article" key={area.key} delay={(i % 2) * 130} className="bg-background p-8">
+            <Reveal as="article" key={area.key} delay={(i % 2) * 130} className="scroll-mt-28 bg-background p-8" id={`area-${area.key}`}>
               <h2 className="text-3xl text-foreground">{area.title}</h2>
               <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{area.detail}</p>
               <ul className="mt-6 space-y-2">

@@ -6,25 +6,25 @@ import heroPublications from "@/assets/hero-publications.jpg";
 import { text } from "@/lib/content.functions";
 import { useSiteContent } from "@/lib/use-content";
 
-export const Route = createFileRoute("/publications")({
+export const Route = createFileRoute("/blog")({
   head: () => ({
     meta: [
-      { title: "Publications — O.O. Kalu & Associates Nigeria" },
+      { title: "Blog — O.O. Kalu & Associates Nigeria" },
       {
         name: "description",
         content:
           "Articles and commentary from O.O. Kalu & Associates partners on Nigerian deal terms, advocacy, CBN compliance, the Petroleum Industry Act, and succession.",
       },
-      { property: "og:title", content: "Publications — O.O. Kalu & Associates Nigeria" },
+      { property: "og:title", content: "Blog — O.O. Kalu & Associates Nigeria" },
       { property: "og:description", content: "Writing from the partners of O.O. Kalu & Associates." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
-  component: PublicationsPage,
+  component: BlogPage,
 });
 
-function PublicationsPage() {
+function BlogPage() {
   const { block, list } = useSiteContent();
   const header = block("publications", "header");
   const rows = list("publications", "publication");
@@ -48,7 +48,7 @@ function PublicationsPage() {
   return (
     <div>
       <PageHeader
-        eyebrow={text(header?.eyebrow, "Writing")}
+        eyebrow={text(header?.eyebrow, "Blog")}
         title={text(header?.title, "Where our thinking is on the record")}
         intro={text(header?.body, "Partners publish on the questions clients keep asking. Reprints are available on request.")}
         image={text(header?.image_url, heroPublications)}
