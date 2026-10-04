@@ -117,6 +117,40 @@ export const adminSaveContent = createServerFn({ method: "POST" })
     return { ok: true as const, id: inserted?.id as string };
   });
 
+export type ContactMessage = {
+  id: string;
+  name: string;
+  email: string;
+  organization: string | null;
+  phone: string | null;
+  practice: string | null;
+  preferred_date: string | null;
+  preferred_time: string | null;
+  message: string;
+  created_at: string;
+};
+
+export const adminListMessages = createServerFn({ method: "GET" }).handler(async (): Promise<ContactMessage[]> => {
+  await requireAdmin();
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const { data, error } = await supabaseAdmin
+    .from("contact_messages")
+    .select("*")
+    .order("created_at", { ascending: false });
+  if (error) throw new Error(error.message);
+  return (data ?? []) as ContactMessage[];
+});
+
+export const adminDeleteMessage = createServerFn({ method: "POST" })
+  .inputValidator((data: { id: string }) => data)
+  .handler(async ({ data }) => {
+    await requireAdmin();
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error } = await supabaseAdmin.from("contact_messages").delete().eq("id", data.id);
+    if (error) throw new Error(error.message);
+    return { ok: true as const };
+  });
+
 export const adminDeleteContent = createServerFn({ method: "POST" })
   .inputValidator((data: { id: string }) => data)
   .handler(async ({ data }) => {

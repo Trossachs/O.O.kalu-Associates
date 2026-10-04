@@ -14,6 +14,45 @@ export type Database = {
   }
   public: {
     Tables: {
+      contact_messages: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          message: string
+          name: string
+          organization: string | null
+          phone: string | null
+          practice: string | null
+          preferred_date: string | null
+          preferred_time: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          message: string
+          name: string
+          organization?: string | null
+          phone?: string | null
+          practice?: string | null
+          preferred_date?: string | null
+          preferred_time?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          message?: string
+          name?: string
+          organization?: string | null
+          phone?: string | null
+          practice?: string | null
+          preferred_date?: string | null
+          preferred_time?: string | null
+        }
+        Relationships: []
+      }
       site_content: {
         Row: {
           body: string | null

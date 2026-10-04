@@ -60,8 +60,10 @@ export function Reveal({
   blur = 8,
   className,
   as: Tag = "div",
+  id,
 }: {
   children: ReactNode;
+  id?: string;
   delay?: number;
   y?: number;
   blur?: number;
@@ -82,7 +84,7 @@ export function Reveal({
   };
 
   return (
-    <Tag ref={ref as never} style={style} className={cn("will-change-transform", className)}>
+    <Tag id={id} ref={ref as never} style={style} className={cn("will-change-transform", className)}>
       {children}
     </Tag>
   );

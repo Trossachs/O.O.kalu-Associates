@@ -5,6 +5,7 @@ import { FIRM, PRACTICE_AREAS } from "@/lib/firm-data";
 import { text } from "@/lib/content.functions";
 import { useSiteContent } from "@/lib/use-content";
 import heroConsultation from "@/assets/hero-consultation.jpg";
+import { submitMessage } from "@/lib/messages.functions";
 
 export const Route = createFileRoute("/consultation")({
   head: () => ({
@@ -31,15 +32,34 @@ function ConsultationPage() {
   const header = block("consultation", "header");
   const [submitted, setSubmitted] = useState<null | { name: string; date: string; time: string }>(null);
   const [time, setTime] = useState(TIMES[1]!);
+  const [sending, setSending] = useState(false);
+  const [sendError, setSendError] = useState<string | null>(null);
 
-  function onSubmit(e: React.FormEvent<HTMLFormElement>) {
+  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const data = new FormData(e.currentTarget);
-    setSubmitted({
-      name: String(data.get("name") ?? ""),
-      date: String(data.get("date") ?? ""),
-      time,
-    });
+    const get = (k: string) => String(data.get(k) ?? "");
+    setSending(true);
+    setSendError(null);
+    try {
+      await submitMessage({
+        data: {
+          name: get("name"),
+          email: get("email"),
+          organization: get("organization"),
+          phone: get("phone"),
+          practice: get("practice"),
+          preferred_date: get("date"),
+          preferred_time: time,
+          message: get("matter"),
+        },
+      });
+      setSubmitted({ name: get("name"), date: get("date"), time });
+    } catch {
+      setSendError("Your message could not be sent. Please check the details and try again.");
+    } finally {
+      setSending(false);
+    }
   }
 
   const field =
@@ -159,11 +179,13 @@ function ConsultationPage() {
                 or highly sensitive details until an engagement is confirmed.
               </p>
 
+              {sendError ? <p className="text-sm text-destructive">{sendError}</p> : null}
               <button
                 type="submit"
-                className="rounded-sm bg-ink px-7 py-3 text-sm text-ink-foreground transition-colors hover:bg-ink/90"
+                disabled={sending}
+                className="rounded-sm bg-ink px-7 py-3 text-sm text-ink-foreground transition-colors hover:bg-ink/90 disabled:opacity-60"
               >
-                Request consultation
+                {sending ? "Sending…" : "Request consultation"}
               </button>
             </form>
           )}

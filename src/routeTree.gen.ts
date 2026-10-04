@@ -12,9 +12,9 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AttorneysRouteImport } from './routes/attorneys'
+import { Route as BlogRouteImport } from './routes/blog'
 import { Route as ConsultationRouteImport } from './routes/consultation'
 import { Route as PracticeAreasRouteImport } from './routes/practice-areas'
-import { Route as PublicationsRouteImport } from './routes/publications'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -31,6 +31,11 @@ const AttorneysRoute = AttorneysRouteImport.update({
   path: '/attorneys',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BlogRoute = BlogRouteImport.update({
+  id: '/blog',
+  path: '/blog',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ConsultationRoute = ConsultationRouteImport.update({
   id: '/consultation',
   path: '/consultation',
@@ -41,36 +46,31 @@ const PracticeAreasRoute = PracticeAreasRouteImport.update({
   path: '/practice-areas',
   getParentRoute: () => rootRouteImport,
 } as any)
-const PublicationsRoute = PublicationsRouteImport.update({
-  id: '/publications',
-  path: '/publications',
-  getParentRoute: () => rootRouteImport,
-} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/attorneys': typeof AttorneysRoute
+  '/blog': typeof BlogRoute
   '/consultation': typeof ConsultationRoute
   '/practice-areas': typeof PracticeAreasRoute
-  '/publications': typeof PublicationsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/attorneys': typeof AttorneysRoute
+  '/blog': typeof BlogRoute
   '/consultation': typeof ConsultationRoute
   '/practice-areas': typeof PracticeAreasRoute
-  '/publications': typeof PublicationsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/attorneys': typeof AttorneysRoute
+  '/blog': typeof BlogRoute
   '/consultation': typeof ConsultationRoute
   '/practice-areas': typeof PracticeAreasRoute
-  '/publications': typeof PublicationsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -78,34 +78,34 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/attorneys'
+    | '/blog'
     | '/consultation'
     | '/practice-areas'
-    | '/publications'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/admin'
     | '/attorneys'
+    | '/blog'
     | '/consultation'
     | '/practice-areas'
-    | '/publications'
   id:
     | '__root__'
     | '/'
     | '/admin'
     | '/attorneys'
+    | '/blog'
     | '/consultation'
     | '/practice-areas'
-    | '/publications'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRoute
   AttorneysRoute: typeof AttorneysRoute
+  BlogRoute: typeof BlogRoute
   ConsultationRoute: typeof ConsultationRoute
   PracticeAreasRoute: typeof PracticeAreasRoute
-  PublicationsRoute: typeof PublicationsRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -131,6 +131,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AttorneysRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/blog': {
+      id: '/blog'
+      path: '/blog'
+      fullPath: '/blog'
+      preLoaderRoute: typeof BlogRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/consultation': {
       id: '/consultation'
       path: '/consultation'
@@ -145,13 +152,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PracticeAreasRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/publications': {
-      id: '/publications'
-      path: '/publications'
-      fullPath: '/publications'
-      preLoaderRoute: typeof PublicationsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
   }
 }
 
@@ -159,9 +159,9 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRoute,
   AttorneysRoute: AttorneysRoute,
+  BlogRoute: BlogRoute,
   ConsultationRoute: ConsultationRoute,
   PracticeAreasRoute: PracticeAreasRoute,
-  PublicationsRoute: PublicationsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
