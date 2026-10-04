@@ -31,15 +31,34 @@ function ConsultationPage() {
   const header = block("consultation", "header");
   const [submitted, setSubmitted] = useState<null | { name: string; date: string; time: string }>(null);
   const [time, setTime] = useState(TIMES[1]!);
+  const [sending, setSending] = useState(false);
+  const [sendError, setSendError] = useState<string | null>(null);
 
-  function onSubmit(e: React.FormEvent<HTMLFormElement>) {
+  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const data = new FormData(e.currentTarget);
-    setSubmitted({
-      name: String(data.get("name") ?? ""),
-      date: String(data.get("date") ?? ""),
-      time,
-    });
+    const get = (k: string) => String(data.get(k) ?? "");
+    setSending(true);
+    setSendError(null);
+    try {
+      await submitMessage({
+        data: {
+          name: get("name"),
+          email: get("email"),
+          organization: get("organization"),
+          phone: get("phone"),
+          practice: get("practice"),
+          preferred_date: get("date"),
+          preferred_time: time,
+          message: get("matter"),
+        },
+      });
+      setSubmitted({ name: get("name"), date: get("date"), time });
+    } catch {
+      setSendError("Your message could not be sent. Please check the details and try again.");
+    } finally {
+      setSending(false);
+    }
   }
 
   const field =
