@@ -12,4 +12,4 @@
 - [x] Founder portrait editable and visible in the 3D book
 - [x] Site renamed to O.O. Kalu & Associates with scale emoji
 - [x] Show only the Owerri office in an admin-editable footer and remove “Est. 1994”
-- [ ] Add distinct homepage content grids, a photo-led team carousel, editable case imagery, and a contact strip.
+- [x] Add distinct homepage content grids, a photo-led team carousel, editable case imagery, and a contact strip.
