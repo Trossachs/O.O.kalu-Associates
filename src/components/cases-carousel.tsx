@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { ArrowLeft, ArrowRight } from "lucide-react";
+import fallbackCaseImage from "@/assets/hero-cases.jpg";
 import type { NotableCase } from "@/lib/firm-data";
 import { Button } from "@/components/ui/button";
 import {
@@ -8,16 +9,6 @@ import {
   CarouselItem,
   type CarouselApi,
 } from "@/components/ui/carousel";
-
-const PRACTICE_SYMBOLS: Record<string, string> = {
-  "Litigation & Arbitration": "⚖️",
-  "Corporate & M&A": "🏢",
-  "Maritime & Shipping": "🚢",
-  "Energy & Natural Resources": "⚡",
-  "Banking & Finance": "🏦",
-  "Regulatory & Investigations": "🛡️",
-  "Real Estate & Infrastructure": "🏗️",
-};
 
 export function CasesCarousel({ cases }: { cases: NotableCase[] }) {
   const [api, setApi] = useState<CarouselApi>();
@@ -44,20 +35,26 @@ export function CasesCarousel({ cases }: { cases: NotableCase[] }) {
         {cases.map((item, index) => (
           <CarouselItem key={item.title} className="basis-[92%] pl-5 md:basis-[72%] lg:basis-[58%]">
             <article
-              className={`flex h-full min-h-80 flex-col border bg-background p-7 transition-[opacity,transform] duration-700 md:min-h-96 md:p-10 ${
+              className={`grid h-full min-h-[32rem] overflow-hidden border bg-background transition-[opacity,transform] duration-700 md:min-h-[28rem] md:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)] ${
                 selected === index ? "border-accent opacity-100" : "border-border opacity-55"
               }`}
             >
-              <div className="flex items-start justify-between gap-5">
-                <span className="text-4xl" aria-hidden="true">
-                  {PRACTICE_SYMBOLS[item.practice] ?? "§"}
-                </span>
-                <span className="font-display text-3xl text-accent">{item.year}</span>
+              <div className="relative min-h-56 overflow-hidden bg-ink md:min-h-full">
+                <img
+                  src={item.image ?? fallbackCaseImage}
+                  alt={`${item.practice} case`}
+                  loading="lazy"
+                  className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 hover:scale-[1.03]"
+                />
+                <div className="absolute inset-0 bg-ink/20" aria-hidden="true" />
               </div>
-              <p className="rule-label mt-8 text-accent">{item.practice}</p>
-              <h3 className="mt-3 max-w-xl text-3xl leading-tight md:text-4xl">{item.title}</h3>
-              <p className="mt-5 max-w-xl text-sm leading-7 text-muted-foreground">{item.detail}</p>
-              <p className="mt-auto pt-8 text-sm font-semibold text-foreground">{item.outcome}</p>
+              <div className="flex min-w-0 flex-col p-7 md:p-10">
+                <span className="font-display text-3xl text-accent">{item.year}</span>
+                <p className="rule-label mt-7 text-accent">{item.practice}</p>
+                <h3 className="mt-3 max-w-xl text-3xl leading-tight md:text-4xl">{item.title}</h3>
+                <p className="mt-5 max-w-xl text-sm leading-7 text-muted-foreground">{item.detail}</p>
+                <p className="mt-auto pt-8 text-sm font-semibold text-foreground">{item.outcome}</p>
+              </div>
             </article>
           </CarouselItem>
         ))}

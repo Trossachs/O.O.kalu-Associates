@@ -8,3 +8,5 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+
+- Homepage people and case carousels read image URLs from editable site content and use bundled images only as fallbacks, so admin changes remain authoritative.
