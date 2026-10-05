@@ -184,6 +184,7 @@ export type NotableCase = {
   practice: string;
   outcome: string;
   detail: string;
+  image?: string;
 };
 
 export const CASES: NotableCase[] = [

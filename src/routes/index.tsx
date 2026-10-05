@@ -4,9 +4,14 @@ import { Parallax, Reveal, TiltCard } from "@/components/motion";
 import { HeroSlider, type Slide } from "@/components/hero-slider";
 import { FounderBook } from "@/components/founder-book";
 import { CasesCarousel } from "@/components/cases-carousel";
+import { TeamCarousel, type TeamMember } from "@/components/team-carousel";
 import { Button } from "@/components/ui/button";
-import { BriefcaseBusiness, Building2, Landmark, Scale } from "lucide-react";
+import { Mail, MapPin, Phone } from "lucide-react";
 import facade from "@/assets/facade.jpg";
+import heroCases from "@/assets/hero-cases.jpg";
+import heroChambers from "@/assets/hero-chambers.jpg";
+import slideLibrary from "@/assets/slide-library.jpg";
+import { ATTORNEY_PHOTOS } from "@/lib/attorney-photos";
 import { text } from "@/lib/content.functions";
 import { useSiteContent } from "@/lib/use-content";
 
@@ -33,7 +38,6 @@ export const Route = createFileRoute("/")({
 
 function Index() {
   const { block, list } = useSiteContent();
-  const benchIcons = [Scale, BriefcaseBusiness, Landmark, Building2];
 
   const hero = block("home", "hero");
   const practiceIntro = block("home", "practice-intro");
@@ -41,15 +45,13 @@ function Index() {
   const benchIntro = block("home", "bench-intro");
   const casesIntro = block("home", "cases-intro");
   const pubIntro = block("home", "publications-intro");
-
-  const statRows = list("home", "stat");
-  const stats = statRows.length
-    ? statRows.map((row) => ({ k: text(row.subtitle, ""), v: text(row.title, "") }))
-    : [
-        { k: "Legal tradition", v: "Established" },
-        { k: "Matters led to judgment or award", v: "180+" },
-        { k: "Transaction value advised", v: "$4.1B" },
-      ];
+  const footer = block("global", "footer");
+  const [footerPhone, footerEmail] = text(footer?.meta, `${FIRM.phone} · ${FIRM.email}`)
+    .split("·")
+    .map((value) => value.trim());
+  const phone = footerPhone || FIRM.phone;
+  const email = footerEmail || FIRM.email;
+  const location = text(footer?.body, FIRM.address);
 
   const areaRows = list("practice-areas", "area");
   const areas = areaRows.length
@@ -57,16 +59,23 @@ function Index() {
     : PRACTICE_AREAS.map((a) => ({ slug: a.slug, title: a.title, summary: a.summary }));
 
   const attorneyRows = list("attorneys", "attorney");
-  const bench = (
+  const bench: TeamMember[] = (
     attorneyRows.length
       ? attorneyRows.map((row) => ({
           slug: row.id,
           name: text(row.title, ""),
           role: text(row.subtitle, ""),
           focus: text(row.eyebrow, ""),
+          photo: text(row.image_url, facade),
         }))
-      : ATTORNEYS.map((a) => ({ slug: a.slug, name: a.name, role: a.role, focus: a.focus }))
-  ).slice(0, 4);
+      : ATTORNEYS.map((a) => ({
+          slug: a.slug,
+          name: a.name,
+          role: a.role,
+          focus: a.focus,
+          photo: ATTORNEY_PHOTOS[a.slug] ?? facade,
+        }))
+  );
 
   const slideRows = list("home", "slide");
   const slides: Slide[] | undefined = slideRows.length
@@ -80,15 +89,20 @@ function Index() {
     : undefined;
 
   const caseRows = list("home", "case");
+  const caseFallbacks = [heroCases, heroChambers, slideLibrary];
   const cases: NotableCase[] = caseRows.length
-    ? caseRows.map((row) => ({
+    ? caseRows.map((row, index) => ({
         year: text(row.eyebrow, ""),
         title: text(row.title, ""),
         practice: text(row.subtitle, ""),
         outcome: text(row.meta, ""),
         detail: text(row.body, ""),
+        image: text(row.image_url, caseFallbacks[index % caseFallbacks.length] ?? heroCases),
       }))
-    : CASES;
+    : CASES.map((item, index) => ({
+        ...item,
+        image: caseFallbacks[index % caseFallbacks.length] ?? heroCases,
+      }));
 
   const testimonialRows = list("home", "testimonial");
   const firstTestimonial = testimonialRows[0];
@@ -134,48 +148,63 @@ function Index() {
       </section>
 
       <section className="border-b border-border bg-parchment">
-        <dl className="mx-auto grid max-w-6xl gap-8 px-6 py-14 sm:grid-cols-3">
-          {stats.map((s, i) => (
-            <Reveal key={`${s.k}-${i}`} delay={i * 140}>
-              <div className="border-t border-border pt-4">
-                <dd className="font-display text-4xl text-accent">{s.v}</dd>
-                <dt className="mt-1 text-xs uppercase tracking-widest text-muted-foreground">{s.k}</dt>
+        <div className="mx-auto grid max-w-6xl gap-8 px-6 py-12 md:grid-cols-[minmax(0,1fr)_auto] md:items-center">
+          <Reveal>
+            <div className="grid gap-4 sm:grid-cols-2 sm:gap-8">
+              <a href={`tel:${phone.replace(/[^+\d]/g, "")}`} className="group flex min-w-0 items-center gap-3">
+                <Phone className="size-5 shrink-0 text-accent" aria-hidden="true" />
+                <span className="min-w-0 break-words font-display text-xl text-foreground group-hover:text-accent">{phone}</span>
+              </a>
+              <a href={`mailto:${email}`} className="group flex min-w-0 items-center gap-3">
+                <Mail className="size-5 shrink-0 text-accent" aria-hidden="true" />
+                <span className="min-w-0 break-all font-display text-xl text-foreground group-hover:text-accent">{email}</span>
+              </a>
+            </div>
+          </Reveal>
+          <Reveal delay={120}>
+            <div className="flex items-start gap-3 border-t border-border pt-5 md:max-w-sm md:border-l md:border-t-0 md:pl-10 md:pt-0">
+              <MapPin className="mt-1 size-5 shrink-0 text-accent" aria-hidden="true" />
+              <div>
+                <p className="rule-label text-accent">Owerri office</p>
+                <p className="mt-2 text-sm leading-6 text-muted-foreground">{location}</p>
               </div>
-            </Reveal>
-          ))}
-        </dl>
+            </div>
+          </Reveal>
+        </div>
       </section>
 
-      <section className="mx-auto max-w-6xl px-6 py-24">
-        <Reveal>
-          <div className="flex flex-wrap items-end justify-between gap-6">
-            <div>
-              <p className="rule-label text-accent">{text(practiceIntro?.eyebrow, "Practice Areas")}</p>
-              <h2 className="mt-3 text-4xl text-foreground">{text(practiceIntro?.title, "Where we are retained")}</h2>
-            </div>
-            <Link to="/practice-areas" className="story-link text-sm text-muted-foreground">
-              All practice areas
-            </Link>
-          </div>
-        </Reveal>
-        <div className="mt-10 grid gap-px bg-border sm:grid-cols-2 lg:grid-cols-3">
-          {areas.map((a, i) => (
-            <Reveal key={a.slug} delay={i * 70}>
-              <Link
-                to="/practice-areas"
-                hash={`area-${a.slug}`}
-                className="group block h-full focus-visible:outline-2 focus-visible:outline-accent"
-              >
-                <TiltCard className="h-full bg-background p-8 transition-colors group-hover:bg-parchment">
-                  <h3 className="text-2xl text-foreground">{a.title}</h3>
-                  <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{a.summary}</p>
-                  <span className="mt-5 inline-block text-xs uppercase tracking-widest text-accent">
-                    Learn more →
-                  </span>
-                </TiltCard>
+      <section className="bg-muted/45 py-24">
+        <div className="mx-auto max-w-6xl px-6">
+          <Reveal>
+            <div className="grid grid-cols-[minmax(0,1fr)_auto] items-end gap-6">
+              <div className="min-w-0">
+                <p className="rule-label text-accent">{text(practiceIntro?.eyebrow, "Practice Areas")}</p>
+                <h2 className="mt-3 text-4xl text-foreground">{text(practiceIntro?.title, "Where we are retained")}</h2>
+              </div>
+              <Link to="/practice-areas" className="story-link shrink-0 text-sm text-muted-foreground">
+                All areas
               </Link>
-            </Reveal>
-          ))}
+            </div>
+          </Reveal>
+          <div className="mt-10 border border-border bg-border p-px shadow-sm">
+            <div className="grid gap-px bg-border sm:grid-cols-2 lg:grid-cols-3">
+              {areas.map((a, i) => (
+                <Reveal key={a.slug} delay={i * 70}>
+                  <Link
+                    to="/practice-areas"
+                    hash={`area-${a.slug}`}
+                    className="group block h-full focus-visible:outline-2 focus-visible:outline-accent"
+                  >
+                    <TiltCard className="h-full bg-background p-8 transition-colors group-hover:bg-parchment">
+                      <h3 className="text-2xl text-foreground">{a.title}</h3>
+                      <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{a.summary}</p>
+                      <span className="mt-5 inline-block text-xs uppercase tracking-widest text-accent">Learn more →</span>
+                    </TiltCard>
+                  </Link>
+                </Reveal>
+              ))}
+            </div>
+          </div>
         </div>
       </section>
 
@@ -214,24 +243,9 @@ function Index() {
               </Link>
             </div>
           </Reveal>
-          <div className="mt-10 grid grid-cols-2 gap-5 md:grid-cols-3 lg:grid-cols-4">
-            {bench.map((a, i) => {
-              const Icon = benchIcons[i] ?? Scale;
-              return (
-                <Reveal key={a.slug} delay={i * 100}>
-                  <article className="group h-full min-h-56 border border-border bg-background p-5 transition-all duration-500 sm:p-7 lg:hover:-translate-y-1 lg:hover:border-accent/60 lg:hover:shadow-lg">
-                    <span className="grid size-10 place-items-center border border-accent/40 text-accent transition-colors duration-500 lg:group-hover:bg-accent lg:group-hover:text-accent-foreground">
-                      <Icon aria-hidden="true" className="size-5" />
-                    </span>
-                    <h3 className="mt-6 text-xl leading-tight text-foreground sm:text-2xl">{a.name}</h3>
-                    <p className="mt-3 line-clamp-2 text-sm leading-relaxed text-muted-foreground">
-                      {a.role}. {a.focus} counsel for consequential Nigerian matters.
-                    </p>
-                  </article>
-                </Reveal>
-              );
-            })}
-          </div>
+          <Reveal delay={100} className="mt-10">
+            <TeamCarousel members={bench} />
+          </Reveal>
         </div>
       </section>
 
@@ -269,28 +283,30 @@ function Index() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-6xl px-6 py-24">
-        <Reveal>
-          <div className="flex flex-wrap items-end justify-between gap-6">
-            <div>
-              <p className="rule-label text-accent">{text(pubIntro?.eyebrow, "Blog")}</p>
-              <h2 className="mt-3 text-4xl text-foreground">{text(pubIntro?.title, "Recent writing")}</h2>
+      <section className="bg-muted/45 py-24">
+        <div className="mx-auto max-w-6xl px-6">
+          <Reveal>
+            <div className="grid grid-cols-[minmax(0,1fr)_auto] items-end gap-6">
+              <div className="min-w-0">
+                <p className="rule-label text-accent">{text(pubIntro?.eyebrow, "Blog")}</p>
+                <h2 className="mt-3 text-4xl text-foreground">{text(pubIntro?.title, "Recent writing")}</h2>
+              </div>
+              <Link to="/blog" className="story-link shrink-0 text-sm text-muted-foreground">All posts</Link>
             </div>
-            <Link to="/blog" className="story-link text-sm text-muted-foreground">
-              All blog posts
-            </Link>
+          </Reveal>
+          <div className="mt-10 border border-border bg-border p-px shadow-sm">
+            <div className="grid gap-px bg-border md:grid-cols-3">
+              {publications.map((p, i) => (
+                <Reveal key={p.key} delay={i * 90}>
+                  <TiltCard className="h-full bg-background p-8" max={5}>
+                    <p className="rule-label text-accent">{p.date}</p>
+                    <h3 className="mt-3 text-xl text-foreground">{p.title}</h3>
+                    <p className="mt-3 text-sm text-muted-foreground">{p.summary}</p>
+                  </TiltCard>
+                </Reveal>
+              ))}
+            </div>
           </div>
-        </Reveal>
-        <div className="mt-10 grid gap-px bg-border md:grid-cols-3">
-          {publications.map((p, i) => (
-            <Reveal key={p.key} delay={i * 90}>
-              <TiltCard className="h-full bg-background p-8" max={5}>
-                <p className="rule-label text-accent">{p.date}</p>
-                <h3 className="mt-3 text-xl text-foreground">{p.title}</h3>
-                <p className="mt-3 text-sm text-muted-foreground">{p.summary}</p>
-              </TiltCard>
-            </Reveal>
-          ))}
         </div>
       </section>
     </div>
