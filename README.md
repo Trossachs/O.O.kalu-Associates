@@ -1,14 +1,18 @@
-# Welcome to your Lovable project
+# Equity Chambers Showcase
+
+Build a sophisticated portfolio website for "Equity Chambers" law firm with all standard professional portfolio features: practice areas, attorney profiles, notable cases, client testimonials, publications, and consultation booking.
 
 This project was built with [Lovable](https://lovable.dev).
 
+**Live app**: https://sunnykalupreview.lovable.app
+
 ## Build with Lovable
 
-Open your project in the [Lovable editor](https://lovable.dev) and keep building.
+Continue developing this project in the [Lovable editor](https://lovable.dev/projects/d44fd187-5213-40ff-8f30-477cb23a247a).
 
 - **Ship faster**: describe what you want to build and Lovable handles the code.
-- **Stay in sync**: connect the project to GitHub and every change made in Lovable is committed straight to your repository.
-- **Full ownership**: this code is yours. Push to your repository and your changes sync back into Lovable, ready for your next prompt.
+- **Stay in sync**: every change made in Lovable is committed straight to this repository.
+- **Full ownership**: this code is yours. Push to `main` on GitHub and your changes sync back into Lovable, ready for your next prompt.
 
 ## Development
 
@@ -20,10 +24,3 @@ cd <repository-name>
 npm i
 npm run dev
 ```
-
-## Built with
-
-- TanStack Start
-- TypeScript
-- React
-- Tailwind CSS
