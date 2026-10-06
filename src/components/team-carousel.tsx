@@ -45,14 +45,14 @@ export function TeamCarousel({ members }: { members: TeamMember[] }) {
             <Link to="/attorneys" className="group block h-full focus-visible:outline-2 focus-visible:outline-accent">
               <article
                 className={`relative h-full min-h-[30rem] overflow-hidden border bg-ink transition-[opacity,transform,border-color] duration-700 sm:min-h-[34rem] ${
-                  selected === index ? "border-accent opacity-100" : "border-border opacity-65"
+                  selected === index ? "border-accent opacity-100" : "border-border opacity-100"
                 }`}
               >
                 <img
                   src={member.photo}
                   alt={`Portrait of ${member.name}, ${member.role}`}
                   loading="lazy"
-                  className="absolute inset-0 h-full w-full object-cover object-top grayscale transition-[filter,transform] duration-700 group-hover:scale-[1.03] group-hover:grayscale-0"
+                  className="absolute inset-0 h-full w-full object-cover object-top transition-transform duration-700 group-hover:scale-[1.03]"
                 />
                 <div className="absolute inset-0 bg-[linear-gradient(to_top,var(--ink)_0%,color-mix(in_oklab,var(--ink)_68%,transparent)_34%,transparent_70%)]" />
                 <div className="absolute inset-x-0 bottom-0 p-6 text-ink-foreground sm:p-8">

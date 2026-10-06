@@ -75,7 +75,7 @@ function AttorneysPage() {
                     src={a.photo}
                     alt={`Portrait of ${a.name}, ${a.role}`}
                     loading="lazy"
-                    className="aspect-[4/5] w-full object-cover grayscale transition-all duration-[900ms] ease-out hover:scale-[1.04] hover:grayscale-0"
+                    className="aspect-[4/5] w-full object-cover transition-transform duration-[900ms] ease-out hover:scale-[1.04]"
                   />
                 </TiltCard>
                 <div>
