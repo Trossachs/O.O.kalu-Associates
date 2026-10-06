@@ -6,6 +6,8 @@ import { text } from "@/lib/content.functions";
 import { useSiteContent } from "@/lib/use-content";
 import heroConsultation from "@/assets/hero-consultation.jpg";
 import { submitMessage } from "@/lib/messages.functions";
+import { useServerFn } from "@tanstack/react-start";
+import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/consultation")({
   head: () => ({
@@ -28,10 +30,11 @@ export const Route = createFileRoute("/consultation")({
 const TIMES = ["09:00", "10:30", "13:00", "14:30", "16:00"];
 
 function ConsultationPage() {
+  const sendMessage = useServerFn(submitMessage);
   const { block } = useSiteContent();
   const header = block("consultation", "header");
   const [submitted, setSubmitted] = useState<null | { name: string; date: string; time: string }>(null);
-  const [time, setTime] = useState(TIMES[1]!);
+  const [time, setTime] = useState("10:30");
   const [sending, setSending] = useState(false);
   const [sendError, setSendError] = useState<string | null>(null);
 
@@ -42,7 +45,7 @@ function ConsultationPage() {
     setSending(true);
     setSendError(null);
     try {
-      await submitMessage({
+      await sendMessage({
         data: {
           name: get("name"),
           email: get("email"),
@@ -55,6 +58,8 @@ function ConsultationPage() {
         },
       });
       setSubmitted({ name: get("name"), date: get("date"), time });
+      const message = `Hi, my name is ${get("name").trim()}. I booked a consultation.`;
+      window.location.assign(`https://wa.me/2348037584212?text=${encodeURIComponent(message)}`);
     } catch {
       setSendError("Your message could not be sent. Please check the details and try again.");
     } finally {
@@ -90,13 +95,13 @@ function ConsultationPage() {
                 We have noted your preferred slot of {submitted.date || "the earliest availability"} at {submitted.time}.
                 A partner will confirm by telephone within one business day.
               </p>
-              <button
+               <Button
                 type="button"
                 onClick={() => setSubmitted(null)}
                 className="mt-8 rounded-sm bg-ink px-5 py-2.5 text-sm text-ink-foreground hover:bg-ink/90"
               >
                 Submit another request
-              </button>
+               </Button>
             </div>
           ) : (
             <form onSubmit={onSubmit} className="space-y-6">
@@ -131,7 +136,7 @@ function ConsultationPage() {
                 <label className={label} htmlFor="practice">
                   Practice area
                 </label>
-                <select id="practice" name="practice" className={field} defaultValue={PRACTICE_AREAS[0]!.title}>
+                <select id="practice" name="practice" className={field} defaultValue={PRACTICE_AREAS[0]?.title ?? "Not sure yet"}>
                   {PRACTICE_AREAS.map((a) => (
                     <option key={a.slug}>{a.title}</option>
                   ))}
@@ -150,7 +155,7 @@ function ConsultationPage() {
                 <legend className={label}>Preferred time</legend>
                 <div className="mt-2 flex flex-wrap gap-2">
                   {TIMES.map((t) => (
-                    <button
+                    <Button
                       key={t}
                       type="button"
                       onClick={() => setTime(t)}
@@ -162,7 +167,7 @@ function ConsultationPage() {
                       }`}
                     >
                       {t}
-                    </button>
+                    </Button>
                   ))}
                 </div>
               </fieldset>
@@ -180,13 +185,13 @@ function ConsultationPage() {
               </p>
 
               {sendError ? <p className="text-sm text-destructive">{sendError}</p> : null}
-              <button
+              <Button
                 type="submit"
                 disabled={sending}
                 className="rounded-sm bg-ink px-7 py-3 text-sm text-ink-foreground transition-colors hover:bg-ink/90 disabled:opacity-60"
               >
                 {sending ? "Sending…" : "Request consultation"}
-              </button>
+              </Button>
             </form>
           )}
         </div>

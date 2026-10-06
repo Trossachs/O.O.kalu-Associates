@@ -186,8 +186,8 @@ function Index() {
               </Link>
             </div>
           </Reveal>
-          <div className="mt-10 border border-border bg-border p-px shadow-sm">
-            <div className="grid gap-px bg-border sm:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-10 border border-border bg-parchment p-4 shadow-sm sm:p-6 lg:p-8">
+            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
               {areas.map((a, i) => (
                 <Reveal key={a.slug} delay={i * 70}>
                   <Link
@@ -195,7 +195,7 @@ function Index() {
                     hash={`area-${a.slug}`}
                     className="group block h-full focus-visible:outline-2 focus-visible:outline-accent"
                   >
-                    <TiltCard className="h-full bg-background p-8 transition-colors group-hover:bg-parchment">
+                    <TiltCard className="h-full border border-border bg-background p-6 transition-colors group-hover:bg-muted sm:p-8 lg:p-10">
                       <h3 className="text-2xl text-foreground">{a.title}</h3>
                       <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{a.summary}</p>
                       <span className="mt-5 inline-block text-xs uppercase tracking-widest text-accent">Learn more →</span>
@@ -294,11 +294,11 @@ function Index() {
               <Link to="/blog" className="story-link shrink-0 text-sm text-muted-foreground">All posts</Link>
             </div>
           </Reveal>
-          <div className="mt-10 border border-border bg-border p-px shadow-sm">
-            <div className="grid gap-px bg-border md:grid-cols-3">
+          <div className="mt-10 border border-border bg-parchment p-4 shadow-sm sm:p-6 lg:p-8">
+            <div className="grid gap-5 md:grid-cols-3">
               {publications.map((p, i) => (
                 <Reveal key={p.key} delay={i * 90}>
-                  <TiltCard className="h-full bg-background p-8" max={5}>
+                  <TiltCard className="h-full border border-border bg-background p-6 sm:p-8 lg:p-10" max={5}>
                     <p className="rule-label text-accent">{p.date}</p>
                     <h3 className="mt-3 text-xl text-foreground">{p.title}</h3>
                     <p className="mt-3 text-sm text-muted-foreground">{p.summary}</p>

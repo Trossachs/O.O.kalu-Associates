@@ -10,3 +10,4 @@
 <!-- LOVABLE:END -->
 
 - Homepage people and case carousels read image URLs from editable site content and use bundled images only as fallbacks, so admin changes remain authoritative.
+- Consultation WhatsApp navigation happens only after the existing message-save function succeeds, so the admin inbox remains the source of record.
