@@ -14,6 +14,24 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_inbox_key: {
+        Row: {
+          id: number
+          key_hash: string
+          updated_at: string
+        }
+        Insert: {
+          id?: number
+          key_hash: string
+          updated_at?: string
+        }
+        Update: {
+          id?: number
+          key_hash?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       contact_messages: {
         Row: {
           created_at: string
@@ -109,7 +127,32 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      admin_delete_message: {
+        Args: { p_id: string; p_key: string }
+        Returns: undefined
+      }
+      admin_list_messages: {
+        Args: { p_key: string }
+        Returns: {
+          created_at: string
+          email: string
+          id: string
+          message: string
+          name: string
+          organization: string | null
+          phone: string | null
+          practice: string | null
+          preferred_date: string | null
+          preferred_time: string | null
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "contact_messages"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
+      inbox_key_ok: { Args: { p_key: string }; Returns: boolean }
     }
     Enums: {
       [_ in never]: never
