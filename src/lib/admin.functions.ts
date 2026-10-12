@@ -1,10 +1,15 @@
 import { createServerFn } from "@tanstack/react-start";
 import { useSession } from "@tanstack/react-start/server";
 import { createHash, timingSafeEqual } from "node:crypto";
+import { z } from "zod";
 
-import { CONTENT_COLUMNS, type ContentRow } from "./content.functions";
+import { publicDb } from "./public-db";
+import { sortRows, type ContentFile } from "./content.functions";
 
 type AdminSession = { admin?: boolean; email?: string };
+
+const CONTENT_PATH = "src/content/site-content.json";
+const GITHUB_API = "https://api.github.com";
 
 function sessionConfig() {
   return {
@@ -27,27 +32,13 @@ async function requireAdmin() {
   return session;
 }
 
-export type ContentInput = {
-  id?: string | null;
-  page: string;
-  section: string;
-  sort_order: number;
-  eyebrow?: string | null;
-  title?: string | null;
-  subtitle?: string | null;
-  body?: string | null;
-  meta?: string | null;
-  bullets?: string | null;
-  image_url?: string | null;
-  link_url?: string | null;
-};
-
 export const adminLogin = createServerFn({ method: "POST" })
   .inputValidator((data: { email: string; password: string }) => data)
   .handler(async ({ data }) => {
     const email = process.env["ADMIN_EMAIL"] ?? "";
     const password = process.env["ADMIN_PASSWORD"] ?? "";
-    if (!email || !password) return { ok: false as const, error: "Admin access is not configured." };
+    if (!email || !password || !process.env["ADMIN_SESSION_SECRET"])
+      return { ok: false as const, error: "Admin access is not configured." };
 
     const okEmail = matches(data.email.trim().toLowerCase(), email.trim().toLowerCase());
     const okPassword = matches(data.password, password);
@@ -65,57 +56,12 @@ export const adminLogout = createServerFn({ method: "POST" }).handler(async () =
 });
 
 export const adminSession = createServerFn({ method: "GET" }).handler(async () => {
+  if (!process.env["ADMIN_SESSION_SECRET"]) return { admin: false, email: null };
   const session = await useSession<AdminSession>(sessionConfig());
   return { admin: Boolean(session.data.admin), email: session.data.email ?? null };
 });
 
-export const adminListContent = createServerFn({ method: "GET" }).handler(async (): Promise<ContentRow[]> => {
-  await requireAdmin();
-  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-  const { data, error } = await supabaseAdmin
-    .from("site_content")
-    .select(CONTENT_COLUMNS)
-    .order("page")
-    .order("section")
-    .order("sort_order");
-  if (error) throw new Error(error.message);
-  return (data ?? []) as ContentRow[];
-});
-
-export const adminSaveContent = createServerFn({ method: "POST" })
-  .inputValidator((data: ContentInput) => data)
-  .handler(async ({ data }) => {
-    await requireAdmin();
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-
-    const payload = {
-      page: data.page.trim(),
-      section: data.section.trim(),
-      sort_order: Number.isFinite(data.sort_order) ? data.sort_order : 0,
-      eyebrow: data.eyebrow ?? null,
-      title: data.title ?? null,
-      subtitle: data.subtitle ?? null,
-      body: data.body ?? null,
-      meta: data.meta ?? null,
-      bullets: data.bullets ?? null,
-      image_url: data.image_url ?? null,
-      link_url: data.link_url ?? null,
-    };
-
-    if (data.id) {
-      const { error } = await supabaseAdmin.from("site_content").update(payload).eq("id", data.id);
-      if (error) throw new Error(error.message);
-      return { ok: true as const, id: data.id };
-    }
-
-    const { data: inserted, error } = await supabaseAdmin
-      .from("site_content")
-      .insert(payload)
-      .select("id")
-      .single();
-    if (error) throw new Error(error.message);
-    return { ok: true as const, id: inserted?.id as string };
-  });
+/* ---------- Consultation messages (private, stay in the database) ---------- */
 
 export type ContactMessage = {
   id: string;
@@ -130,33 +76,155 @@ export type ContactMessage = {
   created_at: string;
 };
 
+function inboxKey() {
+  const key = process.env["INBOX_KEY"];
+  if (!key) throw new Error("The message inbox key is not configured.");
+  return key;
+}
+
 export const adminListMessages = createServerFn({ method: "GET" }).handler(async (): Promise<ContactMessage[]> => {
   await requireAdmin();
-  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-  const { data, error } = await supabaseAdmin
-    .from("contact_messages")
-    .select("*")
-    .order("created_at", { ascending: false });
-  if (error) throw new Error(error.message);
+  const { data, error } = await publicDb().rpc("admin_list_messages", { p_key: inboxKey() });
+  if (error) throw new Error("Could not load messages.");
   return (data ?? []) as ContactMessage[];
 });
 
 export const adminDeleteMessage = createServerFn({ method: "POST" })
-  .inputValidator((data: { id: string }) => data)
+  .inputValidator((data: { id: string }) => z.object({ id: z.string().uuid() }).parse(data))
   .handler(async ({ data }) => {
     await requireAdmin();
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { error } = await supabaseAdmin.from("contact_messages").delete().eq("id", data.id);
-    if (error) throw new Error(error.message);
+    const { error } = await publicDb().rpc("admin_delete_message", { p_key: inboxKey(), p_id: data.id });
+    if (error) throw new Error("Could not delete the message.");
     return { ok: true as const };
   });
 
-export const adminDeleteContent = createServerFn({ method: "POST" })
-  .inputValidator((data: { id: string }) => data)
+/* ---------- Content publishing to GitHub ---------- */
+
+const nullableText = z.string().max(20000).nullable();
+const rowSchema = z.object({
+  id: z.string().min(1).max(64),
+  page: z.string().trim().min(1).max(60),
+  section: z.string().trim().min(1).max(80),
+  sort_order: z.number().int().min(-10000).max(10000),
+  eyebrow: nullableText,
+  title: nullableText,
+  subtitle: nullableText,
+  body: nullableText,
+  meta: nullableText,
+  bullets: nullableText,
+  image_url: z.string().max(2000).nullable(),
+  link_url: z.string().max(2000).nullable(),
+});
+
+const uploadSchema = z.object({
+  path: z.string().regex(/^public\/uploads\/[a-z0-9][a-z0-9._-]{0,120}\.(jpg|jpeg|png|webp|gif)$/),
+  base64: z.string().max(4_200_000),
+});
+
+const publishSchema = z.object({
+  rows: z.array(rowSchema).max(2000),
+  uploads: z.array(uploadSchema).max(10),
+  message: z.string().trim().max(200).optional(),
+});
+
+function githubConfig() {
+  const token = process.env["GITHUB_TOKEN"];
+  const repo = process.env["GITHUB_REPO"];
+  const branch = process.env["GITHUB_BRANCH"] || "main";
+  if (!token || !repo) throw new Error("Publishing is not configured (GitHub key or repository missing).");
+  return { token, repo, branch };
+}
+
+async function gh<T>(token: string, path: string, init?: { method?: string; body?: unknown }): Promise<T> {
+  const response = await fetch(`${GITHUB_API}${path}`, {
+    method: init?.method ?? "GET",
+    headers: {
+      Accept: "application/vnd.github+json",
+      Authorization: `Bearer ${token}`,
+      "X-GitHub-Api-Version": "2022-11-28",
+      "User-Agent": "kalu-site-admin",
+      ...(init?.body ? { "Content-Type": "application/json" } : {}),
+    },
+    body: init?.body ? JSON.stringify(init.body) : undefined,
+  });
+  if (!response.ok) {
+    const text = await response.text();
+    console.error(`GitHub ${path} failed [${response.status}]: ${text}`);
+    throw new Error(`GitHub rejected the request (${response.status}). ${text.slice(0, 200)}`);
+  }
+  return (await response.json()) as T;
+}
+
+export const publishContent = createServerFn({ method: "POST" })
+  .inputValidator((data: z.input<typeof publishSchema>) => publishSchema.parse(data))
   .handler(async ({ data }) => {
     await requireAdmin();
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { error } = await supabaseAdmin.from("site_content").delete().eq("id", data.id);
-    if (error) throw new Error(error.message);
-    return { ok: true as const };
+    const { token, repo, branch } = githubConfig();
+
+    const ids = new Set<string>();
+    for (const row of data.rows) {
+      if (ids.has(row.id)) throw new Error(`Duplicate item id ${row.id}.`);
+      ids.add(row.id);
+    }
+    for (const upload of data.uploads) {
+      if (Math.floor((upload.base64.length * 3) / 4) > 3 * 1024 * 1024)
+        throw new Error("Each image must be 3 MB or smaller.");
+    }
+
+    const file: ContentFile = { version: 1, exportedAt: new Date().toISOString(), rows: sortRows(data.rows) };
+    const ref = await gh<{ object: { sha: string } }>(token, `/repos/${repo}/git/ref/heads/${branch}`);
+    const parent = await gh<{ tree: { sha: string } }>(token, `/repos/${repo}/git/commits/${ref.object.sha}`);
+
+    const tree: { path: string; mode: "100644"; type: "blob"; sha: string }[] = [];
+    const contentBlob = await gh<{ sha: string }>(token, `/repos/${repo}/git/blobs`, {
+      method: "POST",
+      body: { content: JSON.stringify(file, null, 2) + "\n", encoding: "utf-8" },
+    });
+    tree.push({ path: CONTENT_PATH, mode: "100644", type: "blob", sha: contentBlob.sha });
+    for (const upload of data.uploads) {
+      const blob = await gh<{ sha: string }>(token, `/repos/${repo}/git/blobs`, {
+        method: "POST",
+        body: { content: upload.base64, encoding: "base64" },
+      });
+      tree.push({ path: upload.path, mode: "100644", type: "blob", sha: blob.sha });
+    }
+
+    const newTree = await gh<{ sha: string }>(token, `/repos/${repo}/git/trees`, {
+      method: "POST",
+      body: { base_tree: parent.tree.sha, tree },
+    });
+    const commit = await gh<{ sha: string; html_url: string }>(token, `/repos/${repo}/git/commits`, {
+      method: "POST",
+      body: { message: data.message || "Update website content from admin", tree: newTree.sha, parents: [ref.object.sha] },
+    });
+    await gh(token, `/repos/${repo}/git/refs/heads/${branch}`, { method: "PATCH", body: { sha: commit.sha } });
+
+    return { ok: true as const, sha: commit.sha, url: commit.html_url };
+  });
+
+export type DeployState = "pending" | "building" | "live" | "failed" | "unknown";
+
+/** Reads the deployment Vercel reports back to GitHub for a commit. */
+export const publishStatus = createServerFn({ method: "GET" })
+  .inputValidator((data: { sha: string }) => z.object({ sha: z.string().regex(/^[a-f0-9]{40}$/) }).parse(data))
+  .handler(async ({ data }): Promise<{ state: DeployState; url: string | null }> => {
+    await requireAdmin();
+    const { token, repo } = githubConfig();
+    const deployments = await gh<{ id: number; environment: string }[]>(
+      token,
+      `/repos/${repo}/deployments?sha=${data.sha}&per_page=10`,
+    );
+    const deployment = deployments.find((d) => /production/i.test(d.environment)) ?? deployments[0];
+    if (!deployment) return { state: "pending", url: null };
+    const statuses = await gh<{ state: string; environment_url?: string; target_url?: string }[]>(
+      token,
+      `/repos/${repo}/deployments/${deployment.id}/statuses?per_page=1`,
+    );
+    const latest = statuses[0];
+    if (!latest) return { state: "pending", url: null };
+    const url = latest.environment_url || latest.target_url || null;
+    if (latest.state === "success") return { state: "live", url };
+    if (latest.state === "failure" || latest.state === "error") return { state: "failed", url };
+    if (latest.state === "in_progress" || latest.state === "queued") return { state: "building", url };
+    return { state: "unknown", url };
   });

@@ -1,6 +1,6 @@
-import { createServerFn } from "@tanstack/react-start";
 import { queryOptions } from "@tanstack/react-query";
-import { createClient } from "@supabase/supabase-js";
+
+import siteContent from "@/content/site-content.json";
 
 export type ContentRow = {
   id: string;
@@ -17,41 +17,33 @@ export type ContentRow = {
   link_url: string | null;
 };
 
-export const CONTENT_COLUMNS =
-  "id, page, section, sort_order, eyebrow, title, subtitle, body, meta, bullets, image_url, link_url";
+export type ContentFile = { version: number; exportedAt: string; rows: ContentRow[] };
 
-export const getSiteContent = createServerFn({ method: "GET" }).handler(async (): Promise<ContentRow[]> => {
-  const key = process.env["SUPABASE_PUBLISHABLE_KEY"]!;
-  const client = createClient(process.env["SUPABASE_URL"]!, key, {
-    auth: { persistSession: false, autoRefreshToken: false },
-    global: {
-      fetch: (input, init) => {
-        const headers = new Headers(init?.headers);
-        if (key.startsWith("sb_") && headers.get("Authorization") === `Bearer ${key}`) headers.delete("Authorization");
-        headers.set("apikey", key);
-        return fetch(input, { ...init, headers });
-      },
-    },
-  });
+/** Field names editable in admin, discovered from the original site_content table. */
+export const CONTENT_FIELDS = [
+  "eyebrow",
+  "title",
+  "subtitle",
+  "body",
+  "meta",
+  "bullets",
+  "image_url",
+  "link_url",
+] as const;
 
-  const { data, error } = await client
-    .from("site_content")
-    .select(CONTENT_COLUMNS)
-    .order("page")
-    .order("section")
-    .order("sort_order");
+export function sortRows(rows: ContentRow[]): ContentRow[] {
+  return [...rows].sort(
+    (a, b) => a.page.localeCompare(b.page) || a.section.localeCompare(b.section) || a.sort_order - b.sort_order,
+  );
+}
 
-  if (error) {
-    console.error("site_content read failed", error.message);
-    return [];
-  }
-  return (data ?? []) as ContentRow[];
-});
+/** Published content, bundled from the repository's JSON file at build time. */
+export const PUBLISHED_CONTENT = siteContent as ContentFile;
 
 export const contentQueryOptions = queryOptions({
   queryKey: ["site-content"],
-  queryFn: () => getSiteContent(),
-  staleTime: 30_000,
+  queryFn: async () => sortRows(PUBLISHED_CONTENT.rows),
+  staleTime: Infinity,
 });
 
 export function one(rows: ContentRow[], page: string, section: string): ContentRow | undefined {

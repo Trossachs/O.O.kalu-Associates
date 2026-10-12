@@ -8,6 +8,13 @@
       "when": 1791072681546,
       "tag": "0000_contact_messages",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1791802731415,
+      "tag": "0001_public_messages_inbox_key",
+      "breakpoints": true
     }
   ]
 }
