@@ -13,7 +13,6 @@ import { useEffect, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { SiteHeader, SiteFooter } from "@/components/site-chrome";
-import { supabase } from "@/integrations/supabase/client";
 import { contentQueryOptions } from "@/lib/content.functions";
 
 function NotFoundComponent() {
@@ -130,19 +129,6 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
-
-  useEffect(() => {
-    const channel = supabase
-      .channel("site-content-live")
-      .on("postgres_changes", { event: "*", schema: "public", table: "site_content" }, () => {
-        queryClient.invalidateQueries({ queryKey: ["site-content"] });
-      })
-      .subscribe();
-
-    return () => {
-      void supabase.removeChannel(channel);
-    };
-  }, [queryClient]);
 
   return (
     <QueryClientProvider client={queryClient}>
