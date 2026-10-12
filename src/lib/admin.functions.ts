@@ -145,7 +145,7 @@ async function gh<T>(token: string, path: string, init?: { method?: string; body
       "User-Agent": "kalu-site-admin",
       ...(init?.body ? { "Content-Type": "application/json" } : {}),
     },
-    body: init?.body ? JSON.stringify(init.body) : undefined,
+    ...(init?.body ? { body: JSON.stringify(init.body) } : {}),
   });
   if (!response.ok) {
     const text = await response.text();

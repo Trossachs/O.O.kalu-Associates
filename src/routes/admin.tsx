@@ -1,22 +1,20 @@
-import { useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Loader2, LogOut, Plus, Save, Trash2 } from "lucide-react";
+import { Loader2, LogOut, Plus, Trash2, UploadCloud } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
-  adminDeleteContent,
   adminDeleteMessage,
-  adminListContent,
   adminListMessages,
   adminLogin,
   adminLogout,
-  adminSaveContent,
   adminSession,
-  type ContentInput,
+  publishContent,
+  publishStatus,
 } from "@/lib/admin.functions";
-import type { ContentRow } from "@/lib/content.functions";
+import { PUBLISHED_CONTENT, sortRows, type ContentRow } from "@/lib/content.functions";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
@@ -33,7 +31,7 @@ export const Route = createFileRoute("/admin")({
   component: AdminPage,
 });
 
-const FIELDS: { key: keyof ContentInput; label: string; multiline?: boolean }[] = [
+const FIELDS: { key: "eyebrow" | "title" | "subtitle" | "body" | "meta" | "bullets" | "image_url" | "link_url"; label: string; multiline?: boolean }[] = [
   { key: "eyebrow", label: "Label / eyebrow" },
   { key: "title", label: "Title" },
   { key: "subtitle", label: "Subtitle" },
@@ -126,22 +124,7 @@ function LoginCard() {
 function Dashboard({ email }: { email: string | null }) {
   const queryClient = useQueryClient();
   const logout = useServerFn(adminLogout);
-  const rows = useQuery({ queryKey: ["admin-content"], queryFn: () => adminListContent() });
-  const [activePage, setActivePage] = useState<string | null>(null);
-
-  const pages = useMemo(() => {
-    const list = Array.from(new Set((rows.data ?? []).map((row) => row.page)));
-    return list.sort();
-  }, [rows.data]);
-
-  const currentPage = activePage ?? pages[0] ?? "home";
-  const pageRows = (rows.data ?? []).filter((row) => row.page === currentPage);
-
-  const refresh = () => {
-    queryClient.invalidateQueries({ queryKey: ["admin-content"] });
-    queryClient.invalidateQueries({ queryKey: ["site-content"] });
-  };
-
+  const [tab, setTab] = useState<"content" | "messages">("content");
   return (
     <div className="mx-auto w-full max-w-6xl px-4 py-10 sm:px-6">
       <div className="flex flex-wrap items-end justify-between gap-4">
@@ -150,69 +133,19 @@ function Dashboard({ email }: { email: string | null }) {
           <h1 className="mt-2 text-3xl text-foreground">Site content</h1>
           <p className="mt-1 text-sm text-muted-foreground">Signed in as {email ?? "administrator"}</p>
         </div>
-        <Button
-          variant="outline"
-          onClick={async () => {
-            await logout({});
-            queryClient.invalidateQueries({ queryKey: ["admin-session"] });
-          }}
-        >
+        <Button variant="outline" onClick={async () => { await logout({}); queryClient.invalidateQueries({ queryKey: ["admin-session"] }); }}>
           <LogOut aria-hidden="true" /> Sign out
         </Button>
       </div>
-
-      <div className="mt-8 flex flex-wrap gap-2">
-        <button
-          type="button"
-          onClick={() => setActivePage(MESSAGES_TAB)}
-          className={`rounded-sm border px-3 py-1.5 text-xs uppercase tracking-widest transition-colors ${
-            currentPage === MESSAGES_TAB
-              ? "border-accent bg-accent text-accent-foreground"
-              : "border-border text-muted-foreground hover:border-accent/60"
-          }`}
-        >
-          ✉️ Messages
-        </button>
-        {pages.map((page) => (
-          <button
-            key={page}
-            type="button"
-            onClick={() => setActivePage(page)}
-            className={`rounded-sm border px-3 py-1.5 text-xs uppercase tracking-widest transition-colors ${
-              page === currentPage
-                ? "border-accent bg-accent text-accent-foreground"
-                : "border-border text-muted-foreground hover:border-accent/60"
-            }`}
-          >
-            {page === "publications" ? "blog" : page}
-          </button>
-        ))}
+      <div className="mt-8 flex gap-2">
+        <Button variant={tab === "content" ? "default" : "outline"} onClick={() => setTab("content")}>Content</Button>
+        <Button variant={tab === "messages" ? "default" : "outline"} onClick={() => setTab("messages")}>✉️ Messages</Button>
       </div>
-
-      {currentPage === MESSAGES_TAB ? (
-        <MessagesInbox />
-      ) : (
-        <>
-          {rows.isLoading ? (
-            <div className="mt-10 flex items-center gap-2 text-sm text-muted-foreground">
-              <Loader2 className="size-4 animate-spin" /> Loading content…
-            </div>
-          ) : null}
-          {rows.error ? <p className="mt-10 text-sm text-destructive">{(rows.error as Error).message}</p> : null}
-
-          <div className="mt-8 space-y-6">
-            {pageRows.map((row) => (
-              <ContentCard key={row.id} row={row} onChanged={refresh} />
-            ))}
-            <NewSectionCard page={currentPage} onChanged={refresh} />
-          </div>
-        </>
-      )}
+      {tab === "messages" ? <MessagesInbox /> : <ContentManager />}
     </div>
   );
 }
 
-const MESSAGES_TAB = "__messages";
 
 function MessagesInbox() {
   const queryClient = useQueryClient();
@@ -275,163 +208,135 @@ function MessagesInbox() {
   );
 }
 
-function toInput(row: ContentRow): ContentInput {
-  return {
-    id: row.id,
-    page: row.page,
-    section: row.section,
-    sort_order: row.sort_order,
-    eyebrow: row.eyebrow,
-    title: row.title,
-    subtitle: row.subtitle,
-    body: row.body,
-    meta: row.meta,
-    bullets: row.bullets,
-    image_url: row.image_url,
-    link_url: row.link_url,
-  };
-}
+type Upload = { path: string; base64: string; preview: string };
+const DRAFT_KEY = "kalu-content-draft";
+const blank = (page: string): ContentRow => ({
+  id: crypto.randomUUID(), page, section: "", sort_order: 0, eyebrow: null, title: null,
+  subtitle: null, body: null, meta: null, bullets: null, image_url: null, link_url: null,
+});
 
-function ContentCard({ row, onChanged }: { row: ContentRow; onChanged: () => void }) {
-  const save = useServerFn(adminSaveContent);
-  const remove = useServerFn(adminDeleteContent);
-  const [draft, setDraft] = useState<ContentInput>(() => toInput(row));
-  const [status, setStatus] = useState<string | null>(null);
+function ContentManager() {
+  const publish = useServerFn(publishContent);
+  const status = useServerFn(publishStatus);
+  const [rows, setRows] = useState<ContentRow[]>(() => sortRows(PUBLISHED_CONTENT.rows));
+  const [uploads, setUploads] = useState<Upload[]>([]);
+  const [activePage, setActivePage] = useState<string>("home");
+  const [note, setNote] = useState<string | null>(null);
+  const [deploy, setDeploy] = useState<{ sha: string; url: string; state: string } | null>(null);
 
-  const saveMutation = useMutation({
-    mutationFn: () => save({ data: draft }),
-    onSuccess: () => {
-      setStatus("Saved");
-      onChanged();
-    },
-    onError: (error: Error) => setStatus(error.message),
-  });
+  useEffect(() => {
+    const saved = window.localStorage.getItem(DRAFT_KEY);
+    if (saved) try { setRows(JSON.parse(saved) as ContentRow[]); setNote("Unpublished draft restored from this browser."); } catch { /* ignore */ }
+  }, []);
+  const update = (next: ContentRow[]) => { setRows(next); window.localStorage.setItem(DRAFT_KEY, JSON.stringify(next)); setNote("Draft saved in this browser — not published yet."); };
 
-  const deleteMutation = useMutation({
-    mutationFn: () => remove({ data: { id: row.id } }),
-    onSuccess: onChanged,
-  });
-
-  return (
-    <article className="rounded-sm border border-border bg-background p-5 sm:p-6">
-      <Editor draft={draft} setDraft={setDraft} />
-      <div className="mt-5 flex flex-wrap items-center gap-3">
-        <Button onClick={() => saveMutation.mutate()} disabled={saveMutation.isPending}>
-          <Save aria-hidden="true" /> {saveMutation.isPending ? "Saving…" : "Save"}
-        </Button>
-        <Button
-          variant="outline"
-          className="text-destructive"
-          onClick={() => {
-            if (window.confirm("Delete this section permanently?")) deleteMutation.mutate();
-          }}
-          disabled={deleteMutation.isPending}
-        >
-          <Trash2 aria-hidden="true" /> Delete
-        </Button>
-        {status ? <span className="text-xs text-muted-foreground">{status}</span> : null}
-      </div>
-    </article>
-  );
-}
-
-function NewSectionCard({ page, onChanged }: { page: string; onChanged: () => void }) {
-  const save = useServerFn(adminSaveContent);
-  const empty: ContentInput = { page, section: "", sort_order: 0 };
-  const [draft, setDraft] = useState<ContentInput>(empty);
-  const [status, setStatus] = useState<string | null>(null);
+  useEffect(() => {
+    if (!deploy || deploy.state === "live" || deploy.state === "failed") return;
+    const t = window.setInterval(async () => {
+      try { const s = await status({ data: { sha: deploy.sha } }); setDeploy((d) => (d ? { ...d, state: s.state } : d)); } catch { /* keep polling */ }
+    }, 10000);
+    return () => window.clearInterval(t);
+  }, [deploy, status]);
 
   const mutation = useMutation({
-    mutationFn: () => save({ data: { ...draft, page } }),
-    onSuccess: () => {
-      setDraft({ page, section: "", sort_order: 0 });
-      setStatus("Added");
-      onChanged();
-    },
-    onError: (error: Error) => setStatus(error.message),
+    mutationFn: () => publish({ data: { rows, uploads: uploads.map(({ path, base64 }) => ({ path, base64 })) } }),
+    onSuccess: (r) => { window.localStorage.removeItem(DRAFT_KEY); setUploads([]); setNote("Committed to GitHub."); setDeploy({ sha: r.sha, url: r.url, state: "pending" }); },
+    onError: (e: Error) => setNote(e.message),
   });
 
+  const pages = Array.from(new Set(rows.map((r) => r.page))).sort();
+  const pageRows = rows.filter((r) => r.page === activePage);
+  const previewFor = (url: string | null) => uploads.find((u) => "/" + u.path.replace(/^public\//, "") === url)?.preview ?? url;
+
   return (
-    <article className="rounded-sm border border-dashed border-accent/50 bg-parchment/40 p-5 sm:p-6">
-      <h2 className="text-lg text-foreground">Add a new item to “{page}”</h2>
-      <p className="mt-1 text-xs text-muted-foreground">
-        Use the same section name as an existing item to add another card to that group.
-      </p>
-      <div className="mt-4">
-        <Editor draft={draft} setDraft={setDraft} />
-      </div>
-      <div className="mt-5 flex flex-wrap items-center gap-3">
-        <Button onClick={() => mutation.mutate()} disabled={mutation.isPending || !draft.section.trim()}>
-          <Plus aria-hidden="true" /> {mutation.isPending ? "Adding…" : "Add item"}
+    <>
+      <div className="mt-6 flex flex-wrap items-center gap-3 rounded-sm border border-border bg-parchment/40 p-4">
+        <Button onClick={() => mutation.mutate()} disabled={mutation.isPending}>
+          <UploadCloud aria-hidden="true" /> {mutation.isPending ? "Publishing…" : "Publish to live site"}
         </Button>
-        {status ? <span className="text-xs text-muted-foreground">{status}</span> : null}
+        {note ? <span className="text-xs text-muted-foreground">{note}</span> : null}
+        {deploy ? (
+          <span className="text-xs text-foreground">
+            Deployment: <strong>{deploy.state}</strong> · <a className="underline" href={deploy.url} target="_blank" rel="noreferrer">commit</a>
+          </span>
+        ) : null}
       </div>
-    </article>
+      <div className="mt-4 flex flex-wrap gap-2">
+        {pages.map((page) => (
+          <button key={page} type="button" onClick={() => setActivePage(page)}
+            className={`rounded-sm border px-3 py-1.5 text-xs uppercase tracking-widest ${page === activePage ? "border-accent bg-accent text-accent-foreground" : "border-border text-muted-foreground"}`}>
+            {page === "publications" ? "blog" : page}
+          </button>
+        ))}
+      </div>
+      <div className="mt-8 space-y-6">
+        {pageRows.map((row) => (
+          <article key={row.id} className="rounded-sm border border-border bg-background p-5 sm:p-6">
+            <Editor row={row} preview={previewFor(row.image_url)}
+              onChange={(next) => update(rows.map((r) => (r.id === row.id ? next : r)))}
+              onUpload={(u) => setUploads((list) => [...list.filter((x) => x.path !== u.path), u])} />
+            <Button variant="outline" className="mt-4 text-destructive"
+              onClick={() => { if (window.confirm("Delete this item?")) update(rows.filter((r) => r.id !== row.id)); }}>
+              <Trash2 aria-hidden="true" /> Delete
+            </Button>
+          </article>
+        ))}
+        <Button variant="outline" onClick={() => update([...rows, blank(activePage)])}>
+          <Plus aria-hidden="true" /> Add item to “{activePage}”
+        </Button>
+      </div>
+    </>
   );
 }
 
-function Editor({
-  draft,
-  setDraft,
-}: {
-  draft: ContentInput;
-  setDraft: (value: ContentInput) => void;
+function Editor({ row, preview, onChange, onUpload }: {
+  row: ContentRow; preview: string | null; onChange: (r: ContentRow) => void; onUpload: (u: Upload) => void;
 }) {
-  const update = (key: keyof ContentInput, value: string) =>
-    setDraft({ ...draft, [key]: key === "sort_order" ? Number(value) || 0 : value });
+  const [error, setError] = useState<string | null>(null);
+  const set = (key: keyof ContentRow, value: string) =>
+    onChange({ ...row, [key]: key === "sort_order" ? Number(value) || 0 : key === "section" || key === "page" ? value : value === "" ? null : value });
+
+  const handleFile = (file: File) => {
+    if (!/^image\/(jpeg|png|webp|gif)$/.test(file.type)) return setError("Use a JPG, PNG, WebP or GIF image.");
+    if (file.size > 3 * 1024 * 1024) return setError("Images must be 3 MB or smaller.");
+    setError(null);
+    const reader = new FileReader();
+    reader.onload = () => {
+      const dataUrl = String(reader.result);
+      const name = `${Date.now()}-${file.name.toLowerCase().replace(/[^a-z0-9.]+/g, "-")}`.slice(0, 100);
+      const path = `public/uploads/${name}`;
+      onUpload({ path, base64: dataUrl.split(",")[1] ?? "", preview: dataUrl });
+      onChange({ ...row, image_url: `/uploads/${name}` });
+    };
+    reader.readAsDataURL(file);
+  };
 
   return (
     <div className="grid gap-4 md:grid-cols-2">
-      <label className="block text-xs uppercase tracking-widest text-muted-foreground">
-        Section
-        <input
-          value={draft.section}
-          onChange={(event) => update("section", event.target.value)}
-          className={`mt-1 ${inputClass}`}
-        />
+      <label className="block text-xs uppercase tracking-widest text-muted-foreground">Section
+        <input value={row.section} onChange={(e) => set("section", e.target.value)} className={`mt-1 ${inputClass}`} />
       </label>
-      <label className="block text-xs uppercase tracking-widest text-muted-foreground">
-        Order
-        <input
-          type="number"
-          value={draft.sort_order}
-          onChange={(event) => update("sort_order", event.target.value)}
-          className={`mt-1 ${inputClass}`}
-        />
+      <label className="block text-xs uppercase tracking-widest text-muted-foreground">Order
+        <input type="number" value={row.sort_order} onChange={(e) => set("sort_order", e.target.value)} className={`mt-1 ${inputClass}`} />
       </label>
-
       {FIELDS.map((field) => (
-        <label
-          key={field.key as string}
-          className={`block text-xs uppercase tracking-widest text-muted-foreground ${
-            field.multiline ? "md:col-span-2" : ""
-          }`}
-        >
+        <label key={field.key} className={`block text-xs uppercase tracking-widest text-muted-foreground ${field.multiline ? "md:col-span-2" : ""}`}>
           {field.label}
           {field.multiline ? (
-            <textarea
-              rows={4}
-              value={(draft[field.key] as string | null) ?? ""}
-              onChange={(event) => update(field.key, event.target.value)}
-              className={`mt-1 ${inputClass}`}
-            />
+            <textarea rows={4} value={row[field.key] ?? ""} onChange={(e) => set(field.key, e.target.value)} className={`mt-1 ${inputClass}`} />
           ) : (
-            <input
-              value={(draft[field.key] as string | null) ?? ""}
-              onChange={(event) => update(field.key, event.target.value)}
-              className={`mt-1 ${inputClass}`}
-            />
+            <input value={row[field.key] ?? ""} onChange={(e) => set(field.key, e.target.value)} className={`mt-1 ${inputClass}`} />
           )}
         </label>
       ))}
-
-      {draft.image_url ? (
+      <label className="block text-xs uppercase tracking-widest text-muted-foreground md:col-span-2">Upload image
+        <input type="file" accept="image/jpeg,image/png,image/webp,image/gif" className="mt-1 block text-sm"
+          onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFile(f); }} />
+        {error ? <span className="mt-1 block normal-case text-destructive">{error}</span> : null}
+      </label>
+      {preview ? (
         <div className="md:col-span-2">
-          <img
-            src={draft.image_url}
-            alt="Preview of the image entered above"
-            className="h-40 w-full max-w-xs rounded-sm border border-border object-cover"
-          />
+          <img src={preview} alt="Preview of this item's image" className="h-40 w-full max-w-xs rounded-sm border border-border object-cover" />
         </div>
       ) : null}
     </div>
