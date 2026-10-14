@@ -129,8 +129,16 @@ const publishSchema = z.object({
 
 function githubConfig() {
   const token = process.env["GITHUB_TOKEN"];
-  const repo = process.env["GITHUB_REPO"];
-  const branch = process.env["GITHUB_BRANCH"] || "main";
+  // Accept "owner/repo" or a pasted GitHub URL like https://github.com/owner/repo.git
+  const repo = (process.env["GITHUB_REPO"] ?? "")
+    .trim()
+    .replace(/^(https?:\/\/)?(www\.)?github\.com\//i, "")
+    .replace(/\.git$/i, "")
+    .replace(/\/+$/, "")
+    .split("/")
+    .slice(0, 2)
+    .join("/");
+  const branch = (process.env["GITHUB_BRANCH"] || "main").trim();
   if (!token || !repo) throw new Error("Publishing is not configured (GitHub key or repository missing).");
   return { token, repo, branch };
 }
