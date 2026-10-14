@@ -22,15 +22,21 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "O.O. Kalu & Associates is a Nigerian law firm based in Owerri, Imo State, advising boards, institutions, and families on transactions, litigation, arbitration, energy, and regulatory matters.",
+          "O.O Kalu & Associates where precedent guides, principles stands and duty endures",
       },
       { property: "og:title", content: "O.O. Kalu & Associates — Nigerian Commercial & Dispute Resolution Law Firm" },
       {
         property: "og:description",
-        content: "A Nigerian firm of advocates and transactional counsel based in Owerri, Imo State.",
+        content: "O.O Kalu & Associates where precedent guides, principles stands and duty endures",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:description", content: "O.O Kalu & Associates where precedent guides, principles stands and duty endures" },
+      { property: "og:image", content: "https://o-o-kalu-associates.lovable.app/images/firm-social.jpg" },
+      { property: "og:image:width", content: "1200" },
+      { property: "og:image:height", content: "630" },
+      { property: "og:image:alt", content: "O.O Kalu & Associates scales of justice" },
+      { name: "twitter:image", content: "https://o-o-kalu-associates.lovable.app/images/firm-social.jpg" },
     ],
   }),
   component: Index,

@@ -5,6 +5,7 @@ import { useSiteContent } from "@/lib/use-content";
 import { text } from "@/lib/content.functions";
 import { Reveal, ScrollProgress, ZoomImage } from "@/components/motion";
 import { Button } from "@/components/ui/button";
+import firmScales from "@/assets/firm-scales.png";
 
 const NAV = [
   { to: "/", label: "Home" },
@@ -64,7 +65,7 @@ export function SiteHeader() {
         }`}
       >
         <Link to="/" className="flex items-baseline gap-3">
-          <span aria-hidden="true" className="text-xl leading-none">⚖️</span>
+          <img src={firmScales} alt="" width={32} height={32} className="h-8 w-8 shrink-0 object-contain" />
           <span className="font-display text-xl tracking-tight text-foreground sm:text-2xl">{firm.name}</span>
         </Link>
 
@@ -128,7 +129,7 @@ export function SiteFooter() {
     <footer className="mt-24 bg-ink text-ink-foreground">
       <div className="mx-auto grid max-w-6xl gap-10 px-6 py-16 md:grid-cols-3">
         <div>
-          <p className="font-display text-2xl">⚖️ {firm.name}</p>
+          <p className="flex items-center gap-3 font-display text-2xl"><img src={firmScales} alt="" width={32} height={32} loading="lazy" className="h-8 w-8 shrink-0 object-contain" />{firm.name}</p>
           <p className="mt-3 max-w-xs text-sm text-ink-foreground/70">{firm.tagline}</p>
         </div>
         <div>
