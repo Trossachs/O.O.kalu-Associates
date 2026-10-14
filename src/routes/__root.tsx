@@ -86,7 +86,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       {
         name: "description",
         content:
-          "A Nigerian law firm based in Owerri, Imo State, advising boards, institutions, and families in consequential matters.",
+          "O.O Kalu & Associates where precedent guides, principles stands and duty endures",
       },
       { name: "author", content: "O.O. Kalu & Associates" },
       { property: "og:type", content: "website" },
@@ -103,7 +103,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         rel: "stylesheet",
         href: "https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=Karla:wght@300;400;500;600&display=swap",
       },
-      { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
+      { rel: "icon", href: "/favicon.png", type: "image/png" },
     ],
   }),
   loader: ({ context }) => context.queryClient.ensureQueryData(contentQueryOptions),
